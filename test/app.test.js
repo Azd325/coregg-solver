@@ -123,3 +123,18 @@ test("attempts left plus moves played never exceed 8, and New round goes back to
   assert.equal(text("#move-title"), "Attempt 1 of 6");
   assert.equal(up.getAttribute("aria-disabled"), "false");
 });
+
+test("move odds name the guesses needed when every target is solvable", async () => {
+  const { text } = await openApp();
+  assert.equal(text("#move-odds"), "Solves 81 of 81, at most 5 guesses");
+});
+
+test("move odds keep the within form when attempts are short", async () => {
+  const { document, text } = await openApp();
+  const down = document.getElementById("tries-down");
+  down.click();
+  down.click();
+  assert.equal(text("#move-odds"), "Solves 55 of 81 within 4 guesses");
+  for (let i = 0; i < 3; i++) down.click();
+  assert.equal(text("#move-odds"), "Solves 1 of 81 within 1 guess");
+});

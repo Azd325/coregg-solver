@@ -81,6 +81,11 @@ function fewestTriesToSolveAll(candidates, tries) {
   return tries;
 }
 
+export function guessesNeeded(candidates, triesLeft) {
+  if (candidates.length === N && triesLeft >= SPARE_OPENING_LIMIT) return SPARE_OPENING_LIMIT;
+  return fewestTriesToSolveAll(candidates, triesLeft);
+}
+
 export function bestMove(candidates, triesLeft) {
   if (triesLeft <= 0 || candidates.length === 0) return null;
   if (triesLeft === 1 || candidates.length === 1) return { guess: candidates[0], hits: 1 };
