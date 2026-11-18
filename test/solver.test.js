@@ -3,6 +3,8 @@ import { test } from "node:test";
 import {
   COMBOS,
   OPENING_MOVE,
+  SPARE_OPENING_MOVE,
+  SPARE_OPENING_LIMIT,
   candidatesFor,
   bestMove,
   comboIndex,
@@ -116,6 +118,13 @@ test("hard-coded opening move matches a fresh search", () => {
   const all = COMBOS.map((_, i) => i);
   assert.deepEqual(bestMove(all, 4), OPENING_MOVE);
   assert.deepEqual(comboValues(OPENING_MOVE.guess), ["v1.0", "GET", "LTE", "AES"]);
+});
+
+test("hard-coded spare-attempt opening matches a fresh search", () => {
+  const all = COMBOS.map((_, i) => i);
+  for (const limit of [SPARE_OPENING_LIMIT, 6, 8]) {
+    assert.deepEqual(bestMove(all, limit), SPARE_OPENING_MOVE);
+  }
 });
 
 function guessCounts(limit) {

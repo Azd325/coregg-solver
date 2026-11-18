@@ -97,10 +97,13 @@ export function bestMove(candidates, triesLeft) {
 }
 
 export const OPENING_MOVE = { guess: 0, hits: 55 };
+export const SPARE_OPENING_LIMIT = 5;
+export const SPARE_OPENING_MOVE = { guess: 0, hits: 81 };
 
 export function recommend(history, limit) {
   const tries = limit - history.length;
   if (history.length === 0 && limit === OPENING_LIMIT) return OPENING_MOVE;
+  if (history.length === 0 && limit >= SPARE_OPENING_LIMIT) return SPARE_OPENING_MOVE;
   return bestMove(candidatesFor(history), tries);
 }
 

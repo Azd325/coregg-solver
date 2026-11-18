@@ -32,7 +32,7 @@ To take over a round that is already running, or to try a move of your own, open
 
 For each possible next move, the solver groups the remaining targets by the mismatch count that move would produce. It then counts, recursively, how many targets it can still hit within the attempts left. It plays the move with the highest count. It first checks the fewest attempts that still solve every remaining target, and searches with that number, so spare attempts never make a win slower. On a tie it prefers a move that can still be the target. A move that cannot be the target can still be the best probe. With four attempts the solver cannot reach every target: the best opening move solves 55 of 81. With five or more attempts it solves all 81, in five guesses at most (4.17 on average).
 
-The search for the four-attempt opening move takes about half a second, so that opening move is precomputed. A test recomputes it. Other limits are searched on demand.
+The search for the four-attempt opening move takes about half a second, so that opening move is precomputed. A test recomputes it. The opening move for five or more attempts is precomputed and tested the same way. Other positions are searched on demand.
 
 ## Use it from an agent
 
