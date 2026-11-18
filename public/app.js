@@ -1,4 +1,4 @@
-import { COMBOS, FIELDS, MAX_TRIES, comboIndex, comboValues, filterCandidates, play, roundState } from "./solver.js";
+import { COMBOS, FIELDS, MAX_TRIES, comboIndex, comboValues, candidatesFor, filterCandidates, play, roundState } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
 const FEEDBACKS = [0, 1, 2, 3, 4];
@@ -26,6 +26,8 @@ function submit(guess, feedback) {
   } else {
     history = result.history;
     conflict = "";
+    state = roundState(history);
+    resetManual();
   }
   render();
 }
@@ -34,12 +36,16 @@ function undo() {
   if (history.length === 0) return;
   history = history.slice(0, -1);
   conflict = "";
+  state = roundState(history);
+  resetManual();
   render();
 }
 
 function reset() {
   history = [];
   conflict = "";
+  state = roundState(history);
+  resetManual();
   render();
 }
 
@@ -106,7 +112,7 @@ function renderHistory() {
     ...Array.from({ length: MAX_TRIES }, (_, i) => {
       const entry = history[i];
       const row = element("tr", entry ? (entry.feedback === 0 ? "hit" : "") : "empty");
-      const left = entry ? roundState(history.slice(0, i + 1)).candidates.length : undefined;
+      const left = entry ? candidatesFor(history.slice(0, i + 1)).length : undefined;
       row.append(
         element("td", "num", String(i + 1)),
         element("td", "move-cell", entry ? label(entry.guess) : "Not played"),
@@ -154,9 +160,12 @@ function renderCandidates() {
   );
 }
 
+function resetManual() {
+  manual = comboValues(state.move?.guess ?? history.at(-1)?.guess ?? 0);
+}
+
 function render() {
   state = roundState(history);
-  manual = comboValues(state.move?.guess ?? history.at(-1)?.guess ?? 0);
   renderScore();
   renderMove();
   renderKeys($("feedback"), state.move?.guess, (feedback) => submit(state.move.guess, feedback), true);
@@ -183,4 +192,6 @@ document.addEventListener("keydown", (event) => {
 
 $("undo").addEventListener("click", undo);
 $("reset").addEventListener("click", reset);
+state = roundState(history);
+resetManual();
 render();
