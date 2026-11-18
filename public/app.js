@@ -1,12 +1,16 @@
-import { COMBOS, FIELDS, MAX_TRIES, comboIndex, comboValues, candidatesFor, filterCandidates, play, roundState } from "./solver.js";
+import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, play, roundState } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
 const FEEDBACKS = [0, 1, 2, 3, 4];
+const DEFAULT_LIMIT = 6;
+const MAX_ATTEMPTS_LEFT = 8;
 
+let limit = DEFAULT_LIMIT;
 let history = [];
-let state = roundState(history);
+let state = roundState(history, limit);
 let manual = [];
 let conflict = "";
+let conflictSource = "";
 
 const label = (index) => comboValues(index).join(" ");
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
@@ -18,17 +22,29 @@ function element(tag, className, text) {
   return node;
 }
 
-function submit(guess, feedback) {
+function submit(guess, feedback, source) {
   if (state.solved || state.triesLeft === 0) return;
+  const focusedId = document.activeElement?.closest?.("#feedback, #manual")?.contains(document.activeElement) ? document.activeElement.id : "";
   const result = play(history, guess, feedback);
   if (result.conflict) {
     conflict = `Conflict: no target fits ${label(guess)} with ${feedback} mismatched. Nothing logged.`;
+    conflictSource = source;
   } else {
     history = result.history;
     conflict = "";
-    state = roundState(history);
+    state = roundState(history, limit);
     resetManual();
   }
+  render();
+  if (focusedId) $(focusedId)?.focus();
+}
+
+function setAttemptsLeft(value) {
+  if (value < 0 || value > MAX_ATTEMPTS_LEFT || value === state.triesLeft) return;
+  limit = value + history.length;
+  conflict = "";
+  state = roundState(history, limit);
+  resetManual();
   render();
 }
 
@@ -36,7 +52,7 @@ function undo() {
   if (history.length === 0) return;
   history = history.slice(0, -1);
   conflict = "";
-  state = roundState(history);
+  state = roundState(history, limit);
   resetManual();
   render();
 }
@@ -44,13 +60,15 @@ function undo() {
 function reset() {
   history = [];
   conflict = "";
-  state = roundState(history);
+  state = roundState(history, limit);
   resetManual();
   render();
 }
 
 function renderScore() {
   $("tries").textContent = state.triesLeft;
+  $("tries-down").setAttribute("aria-disabled", String(state.triesLeft <= 0));
+  $("tries-up").setAttribute("aria-disabled", String(state.triesLeft >= MAX_ATTEMPTS_LEFT));
   $("count").textContent = state.candidates.length;
 }
 
@@ -61,7 +79,7 @@ function renderMove() {
   const previous = solved ? undefined : last?.guess;
 
   $("move").dataset.mode = solved ? "solved" : move ? "play" : "over";
-  $("move-title").textContent = solved ? "Cracked" : move ? `Attempt ${history.length + 1} of ${MAX_TRIES}` : "Out of attempts";
+  $("move-title").textContent = solved ? "Cracked" : move ? `Attempt ${history.length + 1} of ${limit}` : "Out of attempts";
   $("move-odds").textContent = move ? `Solves ${move.hits} of ${candidates.length} in ${plural(triesLeft, "try", "tries")}` : "";
 
   $("cols").replaceChildren(
@@ -80,13 +98,15 @@ function renderMove() {
 
   let note;
   if (solved) note = `Cracked in ${plural(history.length, "attempt", "attempts")}. Press N for a new round.`;
-  else if (!move) note = `${plural(candidates.length, "target", "targets")} left. Press N for a new round.`;
+  else if (!move) note = `${plural(candidates.length, "target", "targets")} left. Press N for a new round, or raise attempts left if the game shows more.`;
   else if (!candidates.includes(move.guess)) note = "A probe: it cannot be the target, but it splits the rest best.";
   else if (triesLeft === 1) note = "Last attempt: one of the possible targets.";
   else if (previous === undefined) note = "Opening move: set all four fields in the game.";
   else note = "Change the lit fields in the game.";
-  $("move-note").textContent = conflict || note;
-  $("move-note").classList.toggle("error", conflict !== "");
+  const mainConflict = conflictSource === "manual" ? "" : conflict;
+  $("move-note").textContent = mainConflict || note;
+  $("move-note").classList.toggle("error", mainConflict !== "");
+  $("manual-note").textContent = conflictSource === "manual" ? conflict : "";
 }
 
 function renderKeys(container, guess, onPick, withShortcut) {
@@ -95,6 +115,7 @@ function renderKeys(container, guess, onPick, withShortcut) {
       const remaining = guess === undefined ? 0 : filterCandidates(state.candidates, guess, feedback).length;
       const key = element("button", feedback === 0 ? "key hit" : "key");
       key.type = "button";
+      key.id = `${container.id}-${feedback}`;
       key.disabled = guess === undefined;
       if (remaining === 0) key.classList.add("dead");
       if (withShortcut) key.setAttribute("aria-keyshortcuts", String(feedback));
@@ -109,7 +130,7 @@ function renderKeys(container, guess, onPick, withShortcut) {
 
 function renderHistory() {
   $("history").replaceChildren(
-    ...Array.from({ length: MAX_TRIES }, (_, i) => {
+    ...Array.from({ length: limit }, (_, i) => {
       const entry = history[i];
       const row = element("tr", entry ? (entry.feedback === 0 ? "hit" : "") : "empty");
       const left = entry ? candidatesFor(history.slice(0, i + 1)).length : undefined;
@@ -150,7 +171,7 @@ function renderManual() {
 
 function renderManualKeys(open) {
   const guess = open ? comboIndex(manual) : undefined;
-  renderKeys($("manual-feedback"), guess, (feedback) => submit(guess, feedback), false);
+  renderKeys($("manual-feedback"), guess, (feedback) => submit(guess, feedback, "manual"), false);
 }
 
 function renderCandidates() {
@@ -167,7 +188,7 @@ function resetManual() {
 function render() {
   renderScore();
   renderMove();
-  renderKeys($("feedback"), state.move?.guess, (feedback) => submit(state.move.guess, feedback), true);
+  renderKeys($("feedback"), state.move?.guess, (feedback) => submit(state.move.guess, feedback, "main"), true);
   $("undo").disabled = history.length === 0;
   renderHistory();
   renderManual();
@@ -177,9 +198,11 @@ function render() {
 document.addEventListener("keydown", (event) => {
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
-  if (/^[0-4]$/.test(key) && state.move) {
+  const inManual = Boolean(event.target.closest?.("#manual"));
+  const guess = inManual ? comboIndex(manual) : state.move?.guess;
+  if (/^[0-4]$/.test(key) && guess !== undefined && !state.solved && state.triesLeft > 0) {
     event.preventDefault();
-    submit(state.move.guess, Number(key));
+    submit(guess, Number(key), inManual ? "manual" : "main");
   } else if (key === "u" || key === "backspace") {
     event.preventDefault();
     undo();
@@ -189,8 +212,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+$("tries-down").addEventListener("click", () => setAttemptsLeft(state.triesLeft - 1));
+$("tries-up").addEventListener("click", () => setAttemptsLeft(state.triesLeft + 1));
 $("undo").addEventListener("click", undo);
 $("reset").addEventListener("click", reset);
-state = roundState(history);
 resetManual();
 render();

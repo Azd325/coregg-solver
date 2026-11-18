@@ -23,10 +23,29 @@ test("solver functions return at once when no tries are left", () => {
 
 test("cli rejects a history longer than the attempt limit", () => {
   const attempts = ["v1.0 GET LTE AES=2", "v1.1 PUT Fiber RSA=3", "v2.0 POST Sat DES=4", "v1.0 PUT Fiber DES=3", "v1.0 GET LTE AES=2"];
-  const result = run(...attempts);
+  const result = run(...attempts, ...attempts.slice(0, 2));
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /at most 4 attempts/);
+  assert.match(result.stderr, /at most 6 attempts/);
   assert.doesNotMatch(result.stderr, /RangeError/);
+});
+
+test("cli accepts more entries than the default limit with --attempts-left", () => {
+  const attempts = ["v1.0 GET LTE AES=2", "v1.0 GET Fiber RSA=2", "v1.0 PUT LTE RSA=3", "v1.0 GET Sat DES=3", "v1.0 POST Fiber AES=0"];
+  const output = JSON.parse(execFileSync("node", [cli, "--attempts-left", "1", ...attempts], { encoding: "utf8" }));
+  assert.equal(output.solved, true);
+  assert.equal(output.triesLeft, 1);
+});
+
+test("cli uses --attempts-left to pick a move that can still win", () => {
+  const output = JSON.parse(execFileSync("node", [cli, "v1.0 GET LTE AES=1", "--attempts-left", "1"], { encoding: "utf8" }));
+  assert.equal(output.triesLeft, 1);
+  assert.ok(output.possibleTargets.includes(output.move));
+});
+
+test("cli rejects a non-numeric --attempts-left", () => {
+  const result = run("--attempts-left", "many");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /--attempts-left needs a whole number/);
 });
 
 test("cli rejects an unknown field value", () => {
@@ -44,14 +63,20 @@ test("cli rejects attempts that leave no possible target", () => {
 test("cli reports candidates and tries left after one attempt", () => {
   const output = JSON.parse(execFileSync("node", [cli, "v1.0 GET LTE AES=2"], { encoding: "utf8" }));
   assert.equal(output.candidates, 24);
-  assert.equal(output.triesLeft, 3);
+  assert.equal(output.triesLeft, 5);
   assert.equal(output.solved, false);
 });
 
 test("cli prints the opening move without arguments", () => {
   const output = JSON.parse(execFileSync("node", [cli], { encoding: "utf8" }));
   assert.equal(output.move, "v1.0 GET LTE AES");
-  assert.equal(output.triesLeft, 4);
+  assert.equal(output.triesLeft, 6);
+});
+
+test("cli defaults to a six-attempt game", () => {
+  const attempts = ["v1.0 GET LTE AES=2", "v1.0 GET Fiber RSA=2", "v1.0 PUT LTE RSA=3", "v1.0 GET Sat DES=3", "v1.0 POST Fiber AES=0"];
+  const output = JSON.parse(execFileSync("node", [cli, ...attempts], { encoding: "utf8" }));
+  assert.equal(output.triesLeft, 1);
 });
 
 test("installed skill folder runs under a commonjs project", () => {

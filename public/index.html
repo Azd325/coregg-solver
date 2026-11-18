@@ -28,7 +28,11 @@
         <dl class="score">
           <div>
             <dt>attempts left</dt>
-            <dd class="figure" id="tries">4</dd>
+            <dd class="figure stepper">
+              <button type="button" class="step" id="tries-down" aria-label="One attempt fewer">&minus;</button>
+              <output id="tries" aria-live="polite">6</output>
+              <button type="button" class="step" id="tries-up" aria-label="One attempt more">+</button>
+            </dd>
           </div>
           <div>
             <dt>possible targets</dt>
@@ -78,10 +82,11 @@
 
       <details class="panel manual" id="manual">
         <summary>Log a different move</summary>
-        <p class="manual-help">Take over a running round, or log a move you chose yourself.</p>
+        <p class="manual-help">Take over a running round, or log a move you chose yourself. Set attempts left to what the game shows.</p>
         <div class="manual-fields" id="manual-fields"></div>
         <p class="manual-help">Then pick what the game reported:</p>
         <div class="manual-keys" id="manual-feedback"></div>
+        <p class="move-note error" id="manual-note" role="status"></p>
       </details>
 
       <section class="panel" aria-labelledby="candidates-title">
