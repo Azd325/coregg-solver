@@ -42,6 +42,12 @@ test("cli uses --attempts-left to pick a move that can still win", () => {
   assert.ok(output.possibleTargets.includes(output.move));
 });
 
+test("cli rejects attempts played plus --attempts-left above 8", () => {
+  const result = run("v1.0 GET LTE AES=2", "v1.1 PUT Fiber RSA=3", "v2.0 POST Sat DES=4", "--attempts-left", "6");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /must not exceed 8/);
+});
+
 test("cli rejects a non-numeric --attempts-left", () => {
   const result = run("--attempts-left", "many");
   assert.equal(result.status, 1);

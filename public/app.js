@@ -3,7 +3,7 @@ import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidate
 const $ = (id) => document.getElementById(id);
 const FEEDBACKS = [0, 1, 2, 3, 4];
 const DEFAULT_LIMIT = 6;
-const MAX_ATTEMPTS_LEFT = 8;
+const MAX_LIMIT = 8;
 
 let limit = DEFAULT_LIMIT;
 let history = [];
@@ -40,7 +40,7 @@ function submit(guess, feedback, source) {
 }
 
 function setAttemptsLeft(value) {
-  if (value < 0 || value > MAX_ATTEMPTS_LEFT || value === state.triesLeft) return;
+  if (value < 0 || value + history.length > MAX_LIMIT || value === state.triesLeft) return;
   limit = value + history.length;
   conflict = "";
   state = roundState(history, limit);
@@ -59,6 +59,7 @@ function undo() {
 
 function reset() {
   history = [];
+  limit = DEFAULT_LIMIT;
   conflict = "";
   state = roundState(history, limit);
   resetManual();
@@ -68,7 +69,7 @@ function reset() {
 function renderScore() {
   $("tries").textContent = state.triesLeft;
   $("tries-down").setAttribute("aria-disabled", String(state.triesLeft <= 0));
-  $("tries-up").setAttribute("aria-disabled", String(state.triesLeft >= MAX_ATTEMPTS_LEFT));
+  $("tries-up").setAttribute("aria-disabled", String(limit >= MAX_LIMIT));
   $("count").textContent = state.candidates.length;
 }
 

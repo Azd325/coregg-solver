@@ -106,3 +106,20 @@ test("page declares a WebApplication and keeps head tags consistent", () => {
   assert.match(meta('meta[name="description"]'), /Unofficial fan tool/);
   assert.equal(document.querySelectorAll("#how-title ~ details").length, 4);
 });
+
+test("attempts left plus moves played never exceed 8, and New round goes back to 6", async () => {
+  const { document, press, text } = await openApp();
+  press("2");
+  press("3");
+  press("2");
+  assert.equal(text("#move-title"), "Attempt 4 of 6");
+  const up = document.getElementById("tries-up");
+  for (let i = 0; i < 10; i++) up.click();
+  assert.equal(text("#tries"), "5");
+  assert.equal(up.getAttribute("aria-disabled"), "true");
+  assert.equal(text("#move-title"), "Attempt 4 of 8");
+  document.getElementById("reset").click();
+  assert.equal(text("#tries"), "6");
+  assert.equal(text("#move-title"), "Attempt 1 of 6");
+  assert.equal(up.getAttribute("aria-disabled"), "false");
+});
