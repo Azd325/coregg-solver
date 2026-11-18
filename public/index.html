@@ -4,21 +4,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta name="description" content="Shows the best next move for the four-field protocol minigame in Cor3.gg. Unofficial fan tool." />
+    <meta name="description" content="Solves the Cor3.gg Mastermind minigame in Cleaner Bot and Fetcher decrypt jobs: pick Version, Method, Channel and Cipher with the fewest attempts. Unofficial fan tool." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://cor3.azd325.com/" />
-    <meta property="og:title" content="Protocol solver for Cor3.gg" />
-    <meta property="og:description" content="Shows the best next move for the four-field protocol minigame in Cor3.gg. Unofficial fan tool." />
+    <meta property="og:title" content="Cor3.gg Mastermind Solver — Cleaner Bot minigame" />
+    <meta property="og:description" content="Solves the Cor3.gg Mastermind minigame in Cleaner Bot and Fetcher decrypt jobs: pick Version, Method, Channel and Cipher with the fewest attempts. Unofficial fan tool." />
     <meta property="og:image" content="https://cor3.azd325.com/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>Protocol solver for Cor3.gg</title>
+    <meta name="twitter:title" content="Cor3.gg Mastermind Solver — Cleaner Bot minigame" />
+    <meta name="twitter:description" content="Solves the Cor3.gg Mastermind minigame in Cleaner Bot and Fetcher decrypt jobs: pick Version, Method, Channel and Cipher with the fewest attempts. Unofficial fan tool." />
+    <title>Cor3.gg Mastermind Solver — Cleaner Bot minigame</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="stylesheet" href="fonts.css" />
     <link rel="stylesheet" href="styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Cor3.gg Mastermind Solver",
+        "url": "https://cor3.azd325.com/",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Any",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Solves the Cor3.gg Mastermind minigame in Cleaner Bot and Fetcher decrypt jobs: pick Version, Method, Channel and Cipher with the fewest attempts. Unofficial fan tool."
+      }
+    </script>
     <script type="module" src="app.js"></script>
   </head>
   <body>
@@ -92,6 +107,26 @@
       <section class="panel" aria-labelledby="candidates-title">
         <h2 id="candidates-title">Possible targets</h2>
         <ul class="candidates" id="candidates"></ul>
+      </section>
+
+      <section class="panel faq" aria-labelledby="how-title">
+        <h2 id="how-title">How it works</h2>
+        <details class="manual">
+          <summary>What is the Mastermind minigame?</summary>
+          <p class="manual-help">In Cor3.gg, the Cleaner Bot stage and some decrypt jobs (Fetcher, for example) open a four-field puzzle. You pick Version, Method, Channel and Cipher, for example v1.0 GET LTE AES. The game tells you how many fields are wrong. It is a Mastermind variant, close to Bulls and Cows. Cor3.gg is the web game that goes with Fragmentary Order.</p>
+        </details>
+        <details class="manual">
+          <summary>How does the solver pick a move?</summary>
+          <p class="manual-help">Each field has three values, so there are 81 combinations. The solver keeps the combinations that still fit and suggests the move that leaves the fewest of them. Enter the mismatch count (0 to 4) the game shows after each try.</p>
+        </details>
+        <details class="manual">
+          <summary>How many attempts do I get?</summary>
+          <p class="manual-help">Players report 4 or 6 attempts, depending on the mode. The solver starts at 6. Use the attempts left control at the top to match what the game shows. Players also report a 20-minute wait after a failure.</p>
+        </details>
+        <details class="manual">
+          <summary>What happens after a failed round?</summary>
+          <p class="manual-help">The game picks a new target. Press New round to clear this round and start again with all 81 combinations.</p>
+        </details>
       </section>
 
       <footer class="foot">

@@ -89,3 +89,20 @@ test("changing attempts left changes the limit and the recommendation", async ()
   document.getElementById("tries-up").click();
   assert.equal(text("#tries"), "2");
 });
+
+test("page declares a WebApplication and keeps head tags consistent", () => {
+  const { document } = new JSDOM(html).window;
+  const meta = (selector) => document.querySelector(selector).content;
+  const data = JSON.parse(document.querySelector('script[type="application/ld+json"]').textContent);
+  assert.equal(data["@type"], "WebApplication");
+  assert.equal(data.applicationCategory, "GameApplication");
+  assert.equal(data.offers.price, "0");
+  assert.equal(data.isAccessibleForFree, true);
+  assert.equal(data.description, meta('meta[name="description"]'));
+  assert.equal(meta('meta[property="og:description"]'), meta('meta[name="description"]'));
+  assert.equal(meta('meta[name="twitter:description"]'), meta('meta[name="description"]'));
+  assert.equal(meta('meta[property="og:title"]'), document.title);
+  assert.equal(meta('meta[name="twitter:title"]'), document.title);
+  assert.match(meta('meta[name="description"]'), /Unofficial fan tool/);
+  assert.equal(document.querySelectorAll("#how-title ~ details").length, 4);
+});
