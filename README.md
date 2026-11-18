@@ -24,7 +24,7 @@ Keep the solver open next to the game:
 1. Set **attempts left** (the − and + buttons) to what the game shows. The solver starts at six, and New round resets it to six. Attempts played plus attempts left cannot exceed eight. Keep it in step with the game: it plans the search for that many attempts.
 2. Set the four fields in the game to the move the solver shows. The fields to change since the last attempt are lit.
 3. Press the reported `Mismatched` number (`0`–`4`) on the keyboard, or tap it. The solver logs the attempt and shows the next move at once.
-4. `0` means a hit. Press `U` to undo a wrong entry and `N` to start a new round.
+4. `0` means a hit. Press `U` to undo a wrong entry and `N` to start a new round. `U` also brings back a round that `N` cleared.
 
 To take over a round that is already running, or to try a move of your own, open **Log a different move**. Pick the four fields, then tap the mismatch count. Set attempts left to what the game shows when you join a round that is already running. If an entry leaves no possible target, the solver shows a conflict and keeps the last valid state.
 
