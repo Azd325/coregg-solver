@@ -20,6 +20,7 @@ function parseAttempt(arg) {
 }
 
 const DEFAULT_LIMIT = 6;
+const MAX_LIMIT = 8;
 const args = process.argv.slice(2);
 const flag = args.indexOf("--attempts-left");
 let attemptsLeft;
@@ -29,6 +30,7 @@ if (flag !== -1) {
   attemptsLeft = Number(value);
 }
 const limit = attemptsLeft === undefined ? DEFAULT_LIMIT : attemptsLeft + args.length;
+if (limit > MAX_LIMIT) fail(`attempts played plus --attempts-left must not exceed ${MAX_LIMIT}, got ${limit}`);
 if (args.length > limit) fail(`at most ${limit} attempts allowed, got ${args.length}`);
 
 const state = roundState(args.map(parseAttempt), limit);
