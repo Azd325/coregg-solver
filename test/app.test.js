@@ -153,12 +153,25 @@ test("styles load through link tags in order, not @import", () => {
   const { document } = new JSDOM(html).window;
   const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((link) => link.getAttribute("href"));
   assert.deepEqual(sheets.slice(-3), ["tokens.css", "base.css", "styles.css"]);
-  assert.doesNotMatch(readFileSync(new URL("../public/styles.css", import.meta.url), "utf8"), /@import/);
+  const { document: sheetDocument } = new JSDOM("<style></style>").window;
+  const style = sheetDocument.querySelector("style");
+  style.textContent = readFileSync(new URL("../public/styles.css", import.meta.url), "utf8");
+  const IMPORT_RULE = 3;
+  assert.ok(style.sheet.cssRules.length > 0);
+  assert.deepEqual([...style.sheet.cssRules].filter((rule) => rule.type === IMPORT_RULE), []);
 });
 
 test("fonts are cached as immutable", () => {
-  const headers = readFileSync(new URL("../public/_headers", import.meta.url), "utf8");
-  assert.match(headers, /^\/fonts\/\*\n {2}Cache-Control: public, max-age=31536000, immutable$/m);
+  const rules = {};
+  let path;
+  for (const line of readFileSync(new URL("../public/_headers", import.meta.url), "utf8").split("\n")) {
+    if (/^\S/.test(line)) path = line.trim();
+    else if (path && /^\s+\S/.test(line)) {
+      const [name, ...value] = line.trim().split(":");
+      (rules[path] ??= {})[name.toLowerCase()] = value.join(":").trim();
+    }
+  }
+  assert.equal(rules["/fonts/*"]["cache-control"], "public, max-age=31536000, immutable");
 });
 
 test("candidates list keeps its list role", () => {
