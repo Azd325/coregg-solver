@@ -31,6 +31,10 @@ For each possible next move, the solver groups the remaining targets by the mism
 
 The search for the opening move takes about half a second, so the opening move is precomputed. A test recomputes it.
 
+## Use it from an agent
+
+Install the skill with `npx skills add Azd325/coregg-solver`. Your agent then runs the solver locally and tells you the next move.
+
 ## Run locally
 
 The app is static HTML, CSS and JavaScript in `public/`. It has no build step and no dependencies. The page loads its fonts from Google Fonts.

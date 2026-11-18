@@ -61,7 +61,7 @@ function guessScore(candidates, guess, tries) {
 }
 
 export function solvable(candidates, tries) {
-  if (tries === 0 || candidates.length === 0) return 0;
+  if (tries <= 0 || candidates.length === 0) return 0;
   if (tries === 1 || candidates.length === 1) return 1;
   const key = `${tries}:${candidates.join(",")}`;
   let best = memo.get(key);
@@ -75,7 +75,7 @@ export function solvable(candidates, tries) {
 }
 
 export function bestMove(candidates, tries) {
-  if (tries === 0 || candidates.length === 0) return null;
+  if (tries <= 0 || candidates.length === 0) return null;
   if (tries === 1 || candidates.length === 1) return { guess: candidates[0], hits: 1 };
   const possible = new Set(candidates);
   let best = null;
