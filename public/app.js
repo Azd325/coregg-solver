@@ -165,7 +165,6 @@ function resetManual() {
 }
 
 function render() {
-  state = roundState(history);
   renderScore();
   renderMove();
   renderKeys($("feedback"), state.move?.guess, (feedback) => submit(state.move.guess, feedback), true);
