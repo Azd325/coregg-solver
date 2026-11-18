@@ -3,6 +3,7 @@ import { test } from "node:test";
 import {
   COMBOS,
   OPENING_MOVE,
+  candidatesFor,
   bestMove,
   comboIndex,
   comboValues,
@@ -31,7 +32,7 @@ test("mismatch matrix counts differing positions", () => {
 });
 
 test("new round has 81 candidates and 4 tries", () => {
-  const state = roundState([]);
+  const state = roundState([], 4);
   assert.equal(state.candidates.length, 81);
   assert.equal(state.triesLeft, 4);
   assert.equal(state.solved, false);
@@ -39,7 +40,7 @@ test("new round has 81 candidates and 4 tries", () => {
 
 test("v1.0 GET LTE AES -> 2 leaves 24 candidates and 3 tries", () => {
   const { history } = play([], move("v1.0", "GET", "LTE", "AES"), 2);
-  const state = roundState(history);
+  const state = roundState(history, 4);
   assert.equal(state.candidates.length, 24);
   assert.equal(state.triesLeft, 3);
 });
@@ -47,7 +48,7 @@ test("v1.0 GET LTE AES -> 2 leaves 24 candidates and 3 tries", () => {
 test("then v1.1 PUT LTE AES -> 3 leaves 8 candidates and 2 tries", () => {
   let { history } = play([], move("v1.0", "GET", "LTE", "AES"), 2);
   ({ history } = play(history, move("v1.1", "PUT", "LTE", "AES"), 3));
-  const state = roundState(history);
+  const state = roundState(history, 4);
   assert.equal(state.candidates.length, 8);
   assert.equal(state.triesLeft, 2);
 });
@@ -55,7 +56,7 @@ test("then v1.1 PUT LTE AES -> 3 leaves 8 candidates and 2 tries", () => {
 test("alternatively v1.0 GET Fiber RSA -> 4 fixes LTE and AES", () => {
   let { history } = play([], move("v1.0", "GET", "LTE", "AES"), 2);
   ({ history } = play(history, move("v1.0", "GET", "Fiber", "RSA"), 4));
-  assert.deepEqual(labels(roundState(history).candidates), [
+  assert.deepEqual(labels(roundState(history, 4).candidates), [
     "v1.1 PUT LTE AES",
     "v1.1 POST LTE AES",
     "v2.0 PUT LTE AES",
@@ -66,8 +67,8 @@ test("alternatively v1.0 GET Fiber RSA -> 4 fixes LTE and AES", () => {
 test("undo restores the previous candidates and tries exactly", () => {
   const first = play([], move("v1.0", "GET", "LTE", "AES"), 2).history;
   const second = play(first, move("v1.1", "PUT", "LTE", "AES"), 3).history;
-  assert.deepEqual(roundState(second.slice(0, -1)), roundState(first));
-  assert.deepEqual(roundState(first.slice(0, -1)), roundState([]));
+  assert.deepEqual(roundState(second.slice(0, -1), 4), roundState(first, 4));
+  assert.deepEqual(roundState(first.slice(0, -1), 4), roundState([], 4));
 });
 
 test("an entry that leaves no candidates is a conflict and keeps the state", () => {
@@ -79,7 +80,7 @@ test("an entry that leaves no candidates is a conflict and keeps the state", () 
 
 test("feedback 0 solves the round", () => {
   const { history } = play([], move("v2.0", "PUT", "Sat", "RSA"), 0);
-  const state = roundState(history);
+  const state = roundState(history, 4);
   assert.equal(state.solved, true);
   assert.deepEqual(labels(state.candidates), ["v2.0 PUT Sat RSA"]);
   assert.equal(state.move, null);
@@ -105,7 +106,7 @@ test("ties prefer a possible candidate over an earlier probe", () => {
 
 test("a probe outside the candidates can beat every candidate", () => {
   const { history } = play([], move("v1.0", "GET", "LTE", "AES"), 1);
-  const state = roundState(history);
+  const state = roundState(history, 4);
   assert.equal(state.candidates.length, 8);
   assert.deepEqual(state.move, { guess: move("v1.0", "PUT", "Fiber", "RSA"), hits: 8 });
   assert.equal(state.candidates.includes(state.move.guess), false);
@@ -115,4 +116,42 @@ test("hard-coded opening move matches a fresh search", () => {
   const all = COMBOS.map((_, i) => i);
   assert.deepEqual(bestMove(all, 4), OPENING_MOVE);
   assert.deepEqual(comboValues(OPENING_MOVE.guess), ["v1.0", "GET", "LTE", "AES"]);
+});
+
+function targetsSolved(limit) {
+  return COMBOS.filter((_, target) => {
+    let history = [];
+    for (let attempt = 1; attempt <= limit; attempt++) {
+      const { move, solved } = roundState(history, limit);
+      if (solved) return true;
+      if (!move) return false;
+      history = [...history, { guess: move.guess, feedback: mismatch(move.guess, target) }];
+    }
+    return history.at(-1).feedback === 0;
+  }).length;
+}
+
+test("the recommended moves solve 55 of 81 targets with 4 attempts and all 81 with 5 or 6", () => {
+  assert.equal(targetsSolved(4), 55);
+  assert.equal(targetsSolved(5), 81);
+  assert.equal(targetsSolved(6), 81);
+});
+
+test("tries left follow the limit", () => {
+  const { history } = play([], move("v1.0", "GET", "LTE", "AES"), 2);
+  assert.equal(roundState(history, 6).triesLeft, 5);
+  assert.equal(roundState(history, 2).triesLeft, 1);
+});
+
+test("with one attempt left the move is a possible target, not a probe", () => {
+  const { history } = play([], move("v1.0", "GET", "LTE", "AES"), 1);
+  const state = roundState(history, 2);
+  assert.equal(state.triesLeft, 1);
+  assert.ok(candidatesFor(history).includes(state.move.guess));
+});
+
+test("the opening move for a limit other than 4 is searched, not precomputed", () => {
+  const all = COMBOS.map((_, i) => i);
+  assert.deepEqual(roundState([], 6).move, bestMove(all, 6));
+  assert.equal(roundState([], 6).move.hits, 81);
 });

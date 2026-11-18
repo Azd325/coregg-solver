@@ -5,7 +5,7 @@ export const FIELDS = [
   { name: "Cipher", values: ["AES", "RSA", "DES"] },
 ];
 
-export const MAX_TRIES = 4;
+export const OPENING_LIMIT = 4;
 
 export const COMBOS = FIELDS.reduce(
   (combos, field) => combos.flatMap((combo) => field.values.map((_, v) => [...combo, v])),
@@ -90,16 +90,17 @@ export function bestMove(candidates, tries) {
 
 export const OPENING_MOVE = { guess: 0, hits: 55 };
 
-export function recommend(history) {
-  if (history.length === 0) return OPENING_MOVE;
-  return bestMove(candidatesFor(history), MAX_TRIES - history.length);
+export function recommend(history, limit) {
+  const tries = limit - history.length;
+  if (history.length === 0 && limit === OPENING_LIMIT) return OPENING_MOVE;
+  return bestMove(candidatesFor(history), tries);
 }
 
-export function roundState(history) {
+export function roundState(history, limit) {
   const candidates = candidatesFor(history);
-  const triesLeft = MAX_TRIES - history.length;
+  const triesLeft = limit - history.length;
   const solved = history.at(-1)?.feedback === 0;
-  const move = solved ? null : recommend(history);
+  const move = solved ? null : recommend(history, limit);
   return { candidates, triesLeft, solved, move };
 }
 

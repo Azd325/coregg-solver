@@ -72,6 +72,49 @@
   color: var(--color-accent-2);
 }
 
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+  border: var(--rule-hair) solid var(--color-muted);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--dur-short) var(--ease-out);
+}
+
+.step:hover {
+  background: var(--color-paper-3);
+}
+
+.step:active {
+  background: var(--color-rule);
+}
+
+.step:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.step[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 h2 {
   font-family: var(--font-body);
   font-weight: 900;
@@ -482,6 +525,10 @@ kbd {
 .manual-help {
   font-size: var(--text-sm);
   color: var(--color-ink-2);
+}
+
+.manual .move-note {
+  min-height: 0;
 }
 
 .manual-fields {

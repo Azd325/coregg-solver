@@ -29,6 +29,25 @@ test("cli rejects a history longer than the attempt limit", () => {
   assert.doesNotMatch(result.stderr, /RangeError/);
 });
 
+test("cli accepts more entries than the default limit with --attempts-left", () => {
+  const attempts = ["v1.0 GET LTE AES=2", "v1.0 GET Fiber RSA=2", "v1.0 PUT LTE RSA=3", "v1.0 GET Sat DES=3", "v1.0 POST Fiber AES=0"];
+  const output = JSON.parse(execFileSync("node", [cli, "--attempts-left", "1", ...attempts], { encoding: "utf8" }));
+  assert.equal(output.solved, true);
+  assert.equal(output.triesLeft, 1);
+});
+
+test("cli uses --attempts-left to pick a move that can still win", () => {
+  const output = JSON.parse(execFileSync("node", [cli, "v1.0 GET LTE AES=1", "--attempts-left", "1"], { encoding: "utf8" }));
+  assert.equal(output.triesLeft, 1);
+  assert.ok(output.possibleTargets.includes(output.move));
+});
+
+test("cli rejects a non-numeric --attempts-left", () => {
+  const result = run("--attempts-left", "many");
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /--attempts-left needs a whole number/);
+});
+
 test("cli rejects an unknown field value", () => {
   const result = run("v1.1 GET LTE XXX=2");
   assert.equal(result.status, 1);
