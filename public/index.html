@@ -20,6 +20,8 @@
     <link rel="icon" href="favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="tokens.css" />
+    <link rel="stylesheet" href="base.css" />
     <link rel="stylesheet" href="styles.css" />
     <script type="application/ld+json">
       {
@@ -44,9 +46,9 @@
           <div>
             <dt>attempts left</dt>
             <dd class="figure stepper">
-              <button type="button" class="step" id="tries-down" aria-label="One attempt fewer">&minus;</button>
+              <button type="button" class="step" id="tries-down" aria-label="One attempt fewer" aria-disabled="false">&minus;</button>
               <output id="tries" aria-live="polite">6</output>
-              <button type="button" class="step" id="tries-up" aria-label="One attempt more">+</button>
+              <button type="button" class="step" id="tries-up" aria-label="One attempt more" aria-disabled="false">+</button>
             </dd>
           </div>
           <div>
@@ -58,13 +60,18 @@
 
       <noscript><p class="move-note error">The solver runs in your browser. Turn on JavaScript to use it.</p></noscript>
 
-      <section class="move" id="move" aria-labelledby="move-title">
+      <section class="move" id="move" data-mode="play" aria-labelledby="move-title">
         <div class="move-head">
-          <h2 id="move-title">Next move</h2>
-          <p class="move-odds" id="move-odds"></p>
+          <h2 id="move-title" tabindex="-1">Attempt 1 of 6</h2>
+          <p class="move-odds" id="move-odds">Solves 81 of 81, at most 5 guesses</p>
         </div>
-        <div class="cols crt" id="cols"></div>
-        <p class="move-note" id="move-note" role="status"></p>
+        <div class="cols crt" id="cols">
+          <div class="col changed"><span class="col-name">Version<span class="visually-hidden"> (change)</span></span><span class="col-value">v1.0</span><span class="col-place">1 of 3</span></div>
+          <div class="col changed"><span class="col-name">Method<span class="visually-hidden"> (change)</span></span><span class="col-value">GET</span><span class="col-place">1 of 3</span></div>
+          <div class="col changed"><span class="col-name">Channel<span class="visually-hidden"> (change)</span></span><span class="col-value">LTE</span><span class="col-place">1 of 3</span></div>
+          <div class="col changed"><span class="col-name">Cipher<span class="visually-hidden"> (change)</span></span><span class="col-value">AES</span><span class="col-place">1 of 3</span></div>
+        </div>
+        <p class="move-note" id="move-note" role="status">Opening move: set all four fields in the game. Next move: v1.0 GET LTE AES.</p>
       </section>
 
       <section class="keys" aria-labelledby="keys-title">
@@ -72,12 +79,18 @@
           <h2 id="keys-title">Mismatched</h2>
           <p class="hint">Press <kbd>0</kbd> to <kbd>4</kbd></p>
         </div>
-        <div class="key-row" id="feedback"></div>
+        <div class="key-row" id="feedback">
+          <button class="key hit" type="button" id="feedback-0" aria-keyshortcuts="0" aria-describedby="keys-title"><span class="key-n">0</span><span class="key-sub">hit</span></button>
+          <button class="key" type="button" id="feedback-1" aria-keyshortcuts="1" aria-describedby="keys-title"><span class="key-n">1</span><span class="key-sub">8 left</span></button>
+          <button class="key" type="button" id="feedback-2" aria-keyshortcuts="2" aria-describedby="keys-title"><span class="key-n">2</span><span class="key-sub">24 left</span></button>
+          <button class="key" type="button" id="feedback-3" aria-keyshortcuts="3" aria-describedby="keys-title"><span class="key-n">3</span><span class="key-sub">32 left</span></button>
+          <button class="key" type="button" id="feedback-4" aria-keyshortcuts="4" aria-describedby="keys-title"><span class="key-n">4</span><span class="key-sub">16 left</span></button>
+        </div>
       </section>
 
       <div class="actions">
-        <button type="button" class="btn-quiet" id="undo">Undo <kbd>U</kbd></button>
-        <button type="button" class="btn-quiet" id="reset">New round <kbd>N</kbd></button>
+        <button type="button" class="btn-quiet" id="undo" aria-keyshortcuts="U Backspace" disabled>Undo <kbd>U</kbd></button>
+        <button type="button" class="btn-quiet" id="reset" aria-keyshortcuts="N">New round <kbd>N</kbd></button>
       </div>
 
       <section class="panel" aria-labelledby="history-title">
@@ -91,7 +104,14 @@
               <th scope="col" class="num">Left</th>
             </tr>
           </thead>
-          <tbody id="history"></tbody>
+          <tbody id="history">
+            <tr class="empty"><td class="num">1</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+            <tr class="empty"><td class="num">2</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+            <tr class="empty"><td class="num">3</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+            <tr class="empty"><td class="num">4</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+            <tr class="empty"><td class="num">5</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+            <tr class="empty"><td class="num">6</td><td class="move-cell">Not played</td><td class="num"></td><td class="num"></td></tr>
+          </tbody>
         </table>
       </section>
 
@@ -106,7 +126,89 @@
 
       <section class="panel" aria-labelledby="candidates-title">
         <h2 id="candidates-title">Possible targets</h2>
-        <ul class="candidates" id="candidates"></ul>
+        <ul class="candidates" id="candidates" role="list">
+          <li class="pick">v1.0 GET LTE AES</li>
+          <li>v1.0 GET LTE RSA</li>
+          <li>v1.0 GET LTE DES</li>
+          <li>v1.0 GET Fiber AES</li>
+          <li>v1.0 GET Fiber RSA</li>
+          <li>v1.0 GET Fiber DES</li>
+          <li>v1.0 GET Sat AES</li>
+          <li>v1.0 GET Sat RSA</li>
+          <li>v1.0 GET Sat DES</li>
+          <li>v1.0 PUT LTE AES</li>
+          <li>v1.0 PUT LTE RSA</li>
+          <li>v1.0 PUT LTE DES</li>
+          <li>v1.0 PUT Fiber AES</li>
+          <li>v1.0 PUT Fiber RSA</li>
+          <li>v1.0 PUT Fiber DES</li>
+          <li>v1.0 PUT Sat AES</li>
+          <li>v1.0 PUT Sat RSA</li>
+          <li>v1.0 PUT Sat DES</li>
+          <li>v1.0 POST LTE AES</li>
+          <li>v1.0 POST LTE RSA</li>
+          <li>v1.0 POST LTE DES</li>
+          <li>v1.0 POST Fiber AES</li>
+          <li>v1.0 POST Fiber RSA</li>
+          <li>v1.0 POST Fiber DES</li>
+          <li>v1.0 POST Sat AES</li>
+          <li>v1.0 POST Sat RSA</li>
+          <li>v1.0 POST Sat DES</li>
+          <li>v1.1 GET LTE AES</li>
+          <li>v1.1 GET LTE RSA</li>
+          <li>v1.1 GET LTE DES</li>
+          <li>v1.1 GET Fiber AES</li>
+          <li>v1.1 GET Fiber RSA</li>
+          <li>v1.1 GET Fiber DES</li>
+          <li>v1.1 GET Sat AES</li>
+          <li>v1.1 GET Sat RSA</li>
+          <li>v1.1 GET Sat DES</li>
+          <li>v1.1 PUT LTE AES</li>
+          <li>v1.1 PUT LTE RSA</li>
+          <li>v1.1 PUT LTE DES</li>
+          <li>v1.1 PUT Fiber AES</li>
+          <li>v1.1 PUT Fiber RSA</li>
+          <li>v1.1 PUT Fiber DES</li>
+          <li>v1.1 PUT Sat AES</li>
+          <li>v1.1 PUT Sat RSA</li>
+          <li>v1.1 PUT Sat DES</li>
+          <li>v1.1 POST LTE AES</li>
+          <li>v1.1 POST LTE RSA</li>
+          <li>v1.1 POST LTE DES</li>
+          <li>v1.1 POST Fiber AES</li>
+          <li>v1.1 POST Fiber RSA</li>
+          <li>v1.1 POST Fiber DES</li>
+          <li>v1.1 POST Sat AES</li>
+          <li>v1.1 POST Sat RSA</li>
+          <li>v1.1 POST Sat DES</li>
+          <li>v2.0 GET LTE AES</li>
+          <li>v2.0 GET LTE RSA</li>
+          <li>v2.0 GET LTE DES</li>
+          <li>v2.0 GET Fiber AES</li>
+          <li>v2.0 GET Fiber RSA</li>
+          <li>v2.0 GET Fiber DES</li>
+          <li>v2.0 GET Sat AES</li>
+          <li>v2.0 GET Sat RSA</li>
+          <li>v2.0 GET Sat DES</li>
+          <li>v2.0 PUT LTE AES</li>
+          <li>v2.0 PUT LTE RSA</li>
+          <li>v2.0 PUT LTE DES</li>
+          <li>v2.0 PUT Fiber AES</li>
+          <li>v2.0 PUT Fiber RSA</li>
+          <li>v2.0 PUT Fiber DES</li>
+          <li>v2.0 PUT Sat AES</li>
+          <li>v2.0 PUT Sat RSA</li>
+          <li>v2.0 PUT Sat DES</li>
+          <li>v2.0 POST LTE AES</li>
+          <li>v2.0 POST LTE RSA</li>
+          <li>v2.0 POST LTE DES</li>
+          <li>v2.0 POST Fiber AES</li>
+          <li>v2.0 POST Fiber RSA</li>
+          <li>v2.0 POST Fiber DES</li>
+          <li>v2.0 POST Sat AES</li>
+          <li>v2.0 POST Sat RSA</li>
+          <li>v2.0 POST Sat DES</li>
+        </ul>
       </section>
 
       <section class="panel faq" aria-labelledby="how-title">

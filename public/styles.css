@@ -1,6 +1,3 @@
-@import url("./tokens.css");
-@import url("./base.css");
-
 :root {
   --app-width: 30rem;
   --text-figure: 2.5rem;
