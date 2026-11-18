@@ -7,7 +7,7 @@ Run `node scripts/next-move.mjs` with one argument per attempt so far, each `"<V
 
 Example: `node scripts/next-move.mjs "v1.0 GET LTE AES=2"`.
 
-The game allows four or six attempts, depending on the mode. Without a flag the script assumes six. For a four-attempt mode pass `--attempts-left 4`. Pass `--attempts-left N` with the attempts the game still shows, for example `node scripts/next-move.mjs "v1.0 GET LTE AES=2" --attempts-left 5`. Ask the user how many attempts the game gives if you do not know.
+The game allows four or six attempts, depending on the mode. Without a flag the script assumes six. Pass `--attempts-left N` with the attempts the game still shows (4 before the first attempt of a four-attempt mode), for example `node scripts/next-move.mjs "v1.0 GET LTE AES=2" --attempts-left 5`. Ask the user how many attempts the game gives if you do not know.
 
 Tell the user the `move` field. With no arguments the script prints the opening move.
 

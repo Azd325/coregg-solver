@@ -36,7 +36,7 @@ The search for the four-attempt opening move takes about half a second, so that 
 
 ## Use it from an agent
 
-Install the skill with `npx skills add Azd325/coregg-solver`. Your agent then runs the solver locally and tells you the next move. The script takes `--attempts-left N` (default: a six-attempt game; pass `--attempts-left 4` for a four-attempt game).
+Install the skill with `npx skills add Azd325/coregg-solver`. Your agent then runs the solver locally and tells you the next move. The script takes `--attempts-left N` (the attempts the game still shows; default: a six-attempt game, so pass `--attempts-left 4` before the first attempt of a four-attempt game).
 
 ## Run locally
 
