@@ -64,7 +64,7 @@ test("focus on a manual radio survives a submit, so the next key still logs the 
   press("4", input);
   assert.equal(document.activeElement.id, input.id);
   press("1", document.activeElement);
-  assert.match(historyRows()[1], /v1\.1 GET LTE RSA/);
+  assert.match(historyRows()[1], /v1\.1 PUT Fiber RSA/);
 });
 
 test("attempts left default to 6 and the history shows one row per attempt", async () => {
