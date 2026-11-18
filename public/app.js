@@ -24,8 +24,7 @@ function element(tag, className, text) {
 
 function submit(guess, feedback, source) {
   if (state.solved || state.triesLeft === 0) return;
-  const focused = document.activeElement?.closest?.("#feedback, #manual-feedback");
-  const focusedIndex = focused ? [...focused.children].indexOf(document.activeElement) : -1;
+  const focusedId = document.activeElement?.closest?.("#feedback, #manual")?.contains(document.activeElement) ? document.activeElement.id : "";
   const result = play(history, guess, feedback);
   if (result.conflict) {
     conflict = `Conflict: no target fits ${label(guess)} with ${feedback} mismatched. Nothing logged.`;
@@ -37,7 +36,7 @@ function submit(guess, feedback, source) {
     resetManual();
   }
   render();
-  focused?.children[focusedIndex]?.focus();
+  if (focusedId) $(focusedId)?.focus();
 }
 
 function setAttemptsLeft(value) {
@@ -116,6 +115,7 @@ function renderKeys(container, guess, onPick, withShortcut) {
       const remaining = guess === undefined ? 0 : filterCandidates(state.candidates, guess, feedback).length;
       const key = element("button", feedback === 0 ? "key hit" : "key");
       key.type = "button";
+      key.id = `${container.id}-${feedback}`;
       key.disabled = guess === undefined;
       if (remaining === 0) key.classList.add("dead");
       if (withShortcut) key.setAttribute("aria-keyshortcuts", String(feedback));

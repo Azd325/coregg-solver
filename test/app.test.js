@@ -56,6 +56,16 @@ test("focus stays on the same key of the same container after a submit", async (
   }
 });
 
+test("focus on a manual radio survives a submit, so the next key still logs the manual pick", async () => {
+  const { document, press, pick, historyRows } = await openApp();
+  const input = pick(0, "v1.1");
+  input.focus();
+  press("3", input);
+  assert.equal(document.activeElement.id, input.id);
+  press("2", document.activeElement);
+  assert.match(historyRows()[0], /v1\.1 GET LTE AES/);
+});
+
 test("attempts left default to 6 and the history shows one row per attempt", async () => {
   const { text, historyRows } = await openApp();
   assert.equal(text("#tries"), "6");

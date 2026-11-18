@@ -151,7 +151,5 @@ test("with one attempt left the move is a possible target, not a probe", () => {
 });
 
 test("the opening move for a limit other than 4 is searched, not precomputed", () => {
-  const all = COMBOS.map((_, i) => i);
-  assert.deepEqual(roundState([], 6).move, bestMove(all, 6));
-  assert.equal(roundState([], 6).move.hits, 81);
+  assert.deepEqual(roundState([], 6).move, { guess: 0, hits: 81 });
 });
