@@ -4,6 +4,7 @@ import {
   COMBOS,
   OPENING_MOVE,
   SPARE_OPENING_MOVE,
+  guessesNeeded,
   SPARE_OPENING_LIMIT,
   candidatesFor,
   bestMove,
@@ -175,4 +176,12 @@ test("with one attempt left the move is a possible target, not a probe", () => {
 
 test("the opening move for a limit other than 4 is searched, not precomputed", () => {
   assert.deepEqual(roundState([], 6).move, { guess: 0, hits: 81 });
+});
+
+test("guessesNeeded is the fewest guesses that solve every target", () => {
+  const all = candidatesFor([]);
+  assert.ok(solvable(all, 4) < all.length);
+  assert.equal(solvable(all, 5), all.length);
+  for (const limit of [5, 6, 8]) assert.equal(guessesNeeded(all, limit), 5);
+  assert.equal(guessesNeeded([7], 3), 1);
 });

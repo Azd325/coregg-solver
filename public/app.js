@@ -1,4 +1,4 @@
-import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, play, roundState } from "./solver.js";
+import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, guessesNeeded, play, roundState } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
 const FEEDBACKS = [0, 1, 2, 3, 4];
@@ -73,6 +73,12 @@ function renderScore() {
   $("count").textContent = state.candidates.length;
 }
 
+function moveOdds({ hits }, candidates, triesLeft) {
+  const solvesAll = hits === candidates.length;
+  const guesses = solvesAll ? guessesNeeded(candidates, triesLeft) : triesLeft;
+  return `Solves ${hits} of ${candidates.length}${solvesAll ? ", at most" : " within"} ${plural(guesses, "guess", "guesses")}`;
+}
+
 function renderMove() {
   const { move, solved, triesLeft, candidates } = state;
   const last = history.at(-1);
@@ -81,7 +87,7 @@ function renderMove() {
 
   $("move").dataset.mode = solved ? "solved" : move ? "play" : "over";
   $("move-title").textContent = solved ? "Cracked" : move ? `Attempt ${history.length + 1} of ${limit}` : "Out of attempts";
-  $("move-odds").textContent = move ? `Solves ${move.hits} of ${candidates.length} in ${plural(triesLeft, "try", "tries")}` : "";
+  $("move-odds").textContent = move ? moveOdds(move, candidates, triesLeft) : "";
 
   $("cols").replaceChildren(
     ...FIELDS.map((field, f) => {
