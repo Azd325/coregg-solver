@@ -1,6 +1,8 @@
 # coregg-solver
 
-Next-move solver for the Cor3.gg cleaner-bot protocol minigame.
+[![CI](https://img.shields.io/github/actions/workflow/status/Azd325/coregg-solver/test.yml?branch=main)](https://github.com/Azd325/coregg-solver/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) [![Live site](https://img.shields.io/website?url=https%3A%2F%2Fcor3.azd325.com&label=cor3.azd325.com)](https://cor3.azd325.com)
+
+Next-move solver for the Cor3.gg cleaner-bot protocol minigame. Use it at https://cor3.azd325.com.
 
 This is an unofficial fan tool. It is not affiliated with the game or its makers.
 
@@ -33,7 +35,7 @@ The search for the opening move takes about half a second, so the opening move i
 
 ## Run locally
 
-The app is static HTML, CSS and JavaScript in `public/`. It has no build step and no dependencies. The page loads its fonts from Google Fonts.
+The app is static HTML, CSS and JavaScript in `public/`. It has no build step and no dependencies. The fonts are self-hosted in `public/fonts/` under the SIL Open Font License.
 
 ```sh
 npx wrangler dev   # serves public/ as a Cloudflare Worker with static assets
