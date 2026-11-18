@@ -11,6 +11,7 @@ let state = roundState(history, limit);
 let manual = [];
 let conflict = "";
 let conflictSource = "";
+let previousRound = null;
 
 const label = (index) => comboValues(index).join(" ");
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
@@ -24,19 +25,18 @@ function element(tag, className, text) {
 
 function submit(guess, feedback, source) {
   if (state.solved || state.triesLeft === 0) return;
-  const focusedId = document.activeElement?.closest?.("#feedback, #manual")?.contains(document.activeElement) ? document.activeElement.id : "";
   const result = play(history, guess, feedback);
   if (result.conflict) {
     conflict = `Conflict: no target fits ${label(guess)} with ${feedback} mismatched. Nothing logged.`;
     conflictSource = source;
   } else {
     history = result.history;
+    previousRound = null;
     conflict = "";
     state = roundState(history, limit);
     resetManual();
   }
   render();
-  if (focusedId) $(focusedId)?.focus();
 }
 
 function setAttemptsLeft(value) {
@@ -49,8 +49,14 @@ function setAttemptsLeft(value) {
 }
 
 function undo() {
-  if (history.length === 0) return;
-  history = history.slice(0, -1);
+  if (history.length > 0) {
+    history = history.slice(0, -1);
+  } else if (previousRound) {
+    ({ history, limit } = previousRound);
+    previousRound = null;
+  } else {
+    return;
+  }
   conflict = "";
   state = roundState(history, limit);
   resetManual();
@@ -58,6 +64,7 @@ function undo() {
 }
 
 function reset() {
+  if (history.length > 0) previousRound = { history, limit };
   history = [];
   limit = DEFAULT_LIMIT;
   conflict = "";
@@ -94,8 +101,10 @@ function renderMove() {
       const value = shown === undefined ? undefined : COMBOS[shown][f];
       const changed = move !== null && (previous === undefined || value !== COMBOS[previous][f]);
       const col = element("div", changed ? "col changed" : "col");
+      const name = element("span", "col-name", field.name);
+      if (changed) name.append(element("span", "visually-hidden", " (change)"));
       col.append(
-        element("span", "col-name", field.name),
+        name,
         element("span", "col-value", value === undefined ? "?" : field.values[value]),
         element("span", "col-place", value === undefined ? "" : `${value + 1} of ${field.values.length}`),
       );
@@ -103,6 +112,7 @@ function renderMove() {
     }),
   );
 
+  const changedNames = FIELDS.filter((_, f) => move && previous !== undefined && COMBOS[move.guess][f] !== COMBOS[previous][f]).map((field) => field.name);
   let note;
   if (solved) note = `Cracked in ${plural(history.length, "attempt", "attempts")}. Press N for a new round.`;
   else if (!move) note = `${plural(candidates.length, "target", "targets")} left. Press N for a new round, or raise attempts left if the game shows more.`;
@@ -110,6 +120,7 @@ function renderMove() {
   else if (triesLeft === 1) note = "Last attempt: one of the possible targets.";
   else if (previous === undefined) note = "Opening move: set all four fields in the game.";
   else note = "Change the lit fields in the game.";
+  if (move) note += ` Next move: ${label(move.guess)}.${changedNames.length ? ` Change ${changedNames.join(", ")}.` : ""}`;
   const mainConflict = conflictSource === "manual" ? "" : conflict;
   $("move-note").textContent = mainConflict || note;
   $("move-note").classList.toggle("error", mainConflict !== "");
@@ -126,7 +137,7 @@ function renderKeys(container, guess, onPick, withShortcut) {
       key.disabled = guess === undefined;
       if (remaining === 0) key.classList.add("dead");
       if (withShortcut) key.setAttribute("aria-keyshortcuts", String(feedback));
-      key.setAttribute("aria-label", `${feedback} mismatched, ${feedback === 0 ? "a hit" : `${remaining} left`}`);
+      key.setAttribute("aria-describedby", "keys-title");
       key.append(element("span", "key-n", String(feedback)));
       if (withShortcut) key.append(element("span", "key-sub", feedback === 0 ? "hit" : `${remaining} left`));
       key.addEventListener("click", () => onPick(feedback));
@@ -193,13 +204,22 @@ function resetManual() {
 }
 
 function render() {
+  const focusedId = document.activeElement?.id;
   renderScore();
   renderMove();
   renderKeys($("feedback"), state.move?.guess, (feedback) => submit(state.move.guess, feedback, "main"), true);
-  $("undo").disabled = history.length === 0;
+  $("undo").disabled = history.length === 0 && !previousRound;
   renderHistory();
   renderManual();
   renderCandidates();
+  restoreFocus(focusedId);
+}
+
+function restoreFocus(id) {
+  const active = document.activeElement;
+  if (!id || (active && active !== document.body && !active.disabled)) return;
+  const target = $(id);
+  (target && !target.disabled ? target : $("move-title")).focus();
 }
 
 document.addEventListener("keydown", (event) => {
