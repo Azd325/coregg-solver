@@ -118,23 +118,37 @@ test("hard-coded opening move matches a fresh search", () => {
   assert.deepEqual(comboValues(OPENING_MOVE.guess), ["v1.0", "GET", "LTE", "AES"]);
 });
 
-function targetsSolved(limit) {
-  return COMBOS.filter((_, target) => {
+function guessCounts(limit) {
+  const counts = Array(limit + 1).fill(0);
+  COMBOS.forEach((_, target) => {
     let history = [];
     for (let attempt = 1; attempt <= limit; attempt++) {
       const { move, solved } = roundState(history, limit);
-      if (solved) return true;
-      if (!move) return false;
+      if (solved || !move) return;
       history = [...history, { guess: move.guess, feedback: mismatch(move.guess, target) }];
+      if (history.at(-1).feedback === 0) {
+        counts[attempt]++;
+        return;
+      }
     }
-    return history.at(-1).feedback === 0;
-  }).length;
+  });
+  return counts;
 }
+
+const targetsSolved = (limit) => guessCounts(limit).reduce((sum, n) => sum + n, 0);
 
 test("the recommended moves solve 55 of 81 targets with 4 attempts and all 81 with 5 or 6", () => {
   assert.equal(targetsSolved(4), 55);
   assert.equal(targetsSolved(5), 81);
   assert.equal(targetsSolved(6), 81);
+});
+
+test("spare attempts do not slow the solve: no target needs a sixth guess", () => {
+  const expected = [0, 1, 3, 11, 32, 34];
+  for (const limit of [5, 6, 8]) {
+    assert.deepEqual(guessCounts(limit).slice(0, 6), expected);
+    assert.equal(guessCounts(limit).slice(6).reduce((sum, n) => sum + n, 0), 0);
+  }
 });
 
 test("tries left follow the limit", () => {

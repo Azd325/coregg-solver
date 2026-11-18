@@ -74,9 +74,17 @@ export function solvable(candidates, tries) {
   return best;
 }
 
-export function bestMove(candidates, tries) {
-  if (tries <= 0 || candidates.length === 0) return null;
-  if (tries === 1 || candidates.length === 1) return { guess: candidates[0], hits: 1 };
+function fewestTriesToSolveAll(candidates, tries) {
+  for (let t = 1; t < tries; t++) {
+    if (solvable(candidates, t) === candidates.length) return t;
+  }
+  return tries;
+}
+
+export function bestMove(candidates, triesLeft) {
+  if (triesLeft <= 0 || candidates.length === 0) return null;
+  if (triesLeft === 1 || candidates.length === 1) return { guess: candidates[0], hits: 1 };
+  const tries = fewestTriesToSolveAll(candidates, triesLeft);
   const possible = new Set(candidates);
   let best = null;
   for (let guess = 0; guess < N; guess++) {
