@@ -44,9 +44,13 @@ The app is static HTML, CSS and JavaScript in `public/`. It has no build step an
 
 ```sh
 npx wrangler dev   # serves public/ as a Cloudflare Worker with static assets
-npm ci             # installs the test dependency (jsdom)
+npm ci             # installs the dev dependencies (jsdom, wrangler)
 npm test           # runs the tests with Node's built-in test runner
 ```
+
+## Deploy
+
+Cloudflare Workers Builds deploys the site from this repository. A merge to `main` runs `npm test`, then `npx wrangler deploy` to https://cor3.azd325.com. A push to any other branch runs `npx wrangler preview`, and the pull request gets a comment with its Preview URL on `workers.dev`. `wrangler.jsonc` holds the custom domain and the URL settings. Do not deploy by hand.
 
 ## License
 
