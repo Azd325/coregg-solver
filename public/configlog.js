@@ -77,8 +77,13 @@ export function parseConfigLog(text, maxLimit) {
       break;
     }
   }
-  if (limit !== null && entries.length > limit) problem(entries[limit].number, "", `${entries.length} moves do not fit in ${limit} attempts`);
-  else if (entries.length > maxLimit) problem(entries[maxLimit].number, "", `more than ${maxLimit} moves`);
+  const overflow =
+    limit !== null && entries.length > limit
+      ? { at: limit, reason: `${entries.length} moves do not fit in ${limit} attempts` }
+      : entries.length > maxLimit
+        ? { at: maxLimit, reason: `more than ${maxLimit} moves` }
+        : null;
+  if (overflow && !problems.some(({ number }) => number === entries[overflow.at].number)) problem(entries[overflow.at].number, "", overflow.reason);
 
   problems.sort((a, b) => a.number - b.number);
   return { history, limit, problems };

@@ -100,3 +100,8 @@ test("one line over both the attempts and the maximum is flagged once", () => {
   const log = ["Attempts: 8/8", ...Array(9).fill(move)].join("\n");
   assert.equal(problemLines(log).filter((number) => number === 10).length, 1);
 });
+
+test("a move after the hit that is also over the attempts total is flagged once", () => {
+  const move = "Input: v1.0 GET LTE AES Result: Mismatched 0";
+  assert.deepEqual(problemLines(`Attempts: 1/1\n${move}\n${move}`), [3]);
+});
