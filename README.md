@@ -32,6 +32,10 @@ To take over a round that is already running, or to try a move of your own, open
 
 Paste the log lines from the System Log Integrity puzzle into **System Log Integrity**. Each faulty line shows the error button to press and the bad token. The two lines with the most faults are marked as the pair to pick. A line is valid when it reads `[HH:MM:SS] TYPE /sector=N /status=S` with a type from `AUTH`, `TEMP-SYNC`, `SCAN`, `ROUTE-CHECK`, `RADIO-TEST`, `PING`, `SYNC`, a sector from 1 to 256 and a status of `OK`, `WARN` or `ERROR`.
 
+## Signal Hack decoder
+
+Paste the pulses from the Signal Hack puzzle into **Signal Hack decoder**, as `S` for short and `L` for long. Morse reads groups of 5 pulses and binary reads groups of 4, with digits 0 to 9. A reading counts only when the pulse count divides by the group size and every group is a digit. When 40 pulses fit both, the game uses binary, so only binary shows. Any other pulse count that fits both shows both readings, and the page says it cannot decide.
+
 ## How it picks a move
 
 For each possible next move, the solver groups the remaining targets by the mismatch count that move would produce. It then counts, recursively, how many targets it can still hit within the attempts left. It plays the move with the highest count. It first checks the fewest attempts that still solve every remaining target, and searches with that number, so spare attempts never make a win slower. On a tie it prefers a move that can still be the target. A move that cannot be the target can still be the best probe. With four attempts the solver cannot reach every target: the best opening move solves 55 of 81. With five or more attempts it solves all 81, in five guesses at most (4.17 on average).

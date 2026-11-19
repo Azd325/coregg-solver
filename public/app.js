@@ -1,4 +1,5 @@
 import { checkLog } from "./logcheck.js";
+import { decodeSignal } from "./signal.js";
 import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, guessesNeeded, play, roundState } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
@@ -245,6 +246,29 @@ function renderLog() {
   );
 }
 
+const SIGNAL_NOTES = {
+  empty: () => "",
+  invalid: ({ invalid }) => `Only S and L count. Remove: ${invalid.join(" ")}.`,
+  none: ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit no Morse code and no binary code. Check the pulses.`,
+  single: ({ pulses, readings }) => `${plural(pulses.length, "pulse", "pulses")} read as ${readings[0].encoding}.`,
+  "binary-rule": ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit both. The game uses binary here.`,
+  undecided: ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit both. The pulses alone cannot decide.`,
+};
+
+function renderSignal() {
+  const text = $("signal-input").value;
+  const result = decodeSignal(text);
+  $("signal-clear").disabled = text === "";
+  $("signal-summary").textContent = SIGNAL_NOTES[result.status](result);
+  $("signal-readings").replaceChildren(
+    ...result.readings.map(({ encoding, code }) => {
+      const item = element("li", "log-line valid pick");
+      item.append(element("span", "log-text", code), element("span", "log-tag", encoding));
+      return item;
+    }),
+  );
+}
+
 function restoreFocus(id) {
   const active = document.activeElement;
   if (!id || (active && active !== document.body && !active.disabled)) return;
@@ -279,6 +303,12 @@ $("log-clear").addEventListener("click", () => {
   $("log-input").value = "";
   renderLog();
   $("log-input").focus();
+});
+$("signal-input").addEventListener("input", renderSignal);
+$("signal-clear").addEventListener("click", () => {
+  $("signal-input").value = "";
+  renderSignal();
+  $("signal-input").focus();
 });
 resetManual();
 render();
