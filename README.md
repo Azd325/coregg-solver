@@ -62,7 +62,7 @@ npm test           # runs the tests with Node's built-in test runner
 
 ## Deploy
 
-Cloudflare Workers Builds deploys the site from this repository. A merge to `main` runs `npm test`, then `npx wrangler deploy` to https://cor3.azd325.com. A push to any other branch runs `npx wrangler preview`, and the pull request gets a comment with its Preview URL on `workers.dev`. `wrangler.jsonc` holds the custom domain and the URL settings. Do not deploy by hand.
+Cloudflare Workers Builds deploys the site from this repository. A merge to `main` runs `npm test`, then `npx wrangler deploy` to https://cor3.azd325.com. Other branches and pull requests get no preview deploy. `wrangler.jsonc` holds the custom domain and the URL settings. Do not deploy by hand.
 
 ## License
 

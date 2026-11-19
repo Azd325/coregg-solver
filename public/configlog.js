@@ -8,10 +8,11 @@ const ATTEMPTS = /^Attempts:\s*(\d+)(?:\s*\/\s*(\d+))?\s*$/i;
 
 function comboFrom(text) {
   const words = text.split(/\s+/).filter(Boolean);
-  if (words.length !== FIELDS.length) return null;
+  if (words.length !== FIELDS.length) return { reason: `${text || "empty input"} needs ${FIELDS.map(({ name }) => name).join(" ")}` };
   const values = words.map((word, f) => FIELDS[f].values.findIndex((value) => value.toLowerCase() === word.toLowerCase()));
-  if (values.includes(-1)) return null;
-  return COMBOS.findIndex((combo) => combo.every((v, f) => v === values[f]));
+  const bad = values.indexOf(-1);
+  if (bad !== -1) return { reason: `${words[bad]} is not a ${FIELDS[bad].name}` };
+  return { index: COMBOS.findIndex((combo) => combo.every((v, f) => v === values[f])) };
 }
 
 export function parseConfigLog(text, maxLimit) {
@@ -29,8 +30,8 @@ export function parseConfigLog(text, maxLimit) {
     const joined = parts.join(" ");
     const match = joined.match(ENTRY);
     if (!match) return problem(number, joined, "an Input line needs a Result and a Mismatched count");
-    const guess = comboFrom(match[1]);
-    if (guess === null) return problem(number, joined, `${match[1] || "empty input"} is not Version Method Channel Cipher`);
+    const { index: guess, reason } = comboFrom(match[1]);
+    if (reason) return problem(number, joined, reason);
     const feedback = Number(match[2]);
     if (feedback > FIELDS.length) return problem(number, joined, `Mismatched ${match[2]} is more than ${FIELDS.length}`);
     entries.push({ number, guess, feedback });

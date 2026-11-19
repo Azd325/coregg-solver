@@ -124,7 +124,7 @@
       </section>
 
       <details class="panel manual" id="manual">
-        <summary>Log a different move</summary>
+        <summary><h2>Log a different move</h2></summary>
         <p class="manual-help">Take over a running round, or log a move you chose yourself. Set attempts left to what the game shows.</p>
         <div class="manual-fields" id="manual-fields"></div>
         <p class="manual-help">Then pick what the game reported:</p>
@@ -133,13 +133,13 @@
       </details>
 
       <details class="panel manual" id="paste">
-        <summary>Paste the game log</summary>
+        <summary><h2>Paste the game log</h2></summary>
         <p class="manual-help">Copy the Config Hack log from the game and paste it here to take over a round that is already running. The page reads each Input and Mismatched line and the Attempts line. It loads nothing while a line is unclear.</p>
         <label class="visually-hidden" for="paste-input">Config Hack log</label>
         <textarea class="log-input" id="paste-input" rows="6" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Input: v1.0 GET LTE AES&#10;Result:&#10;Mismatched 2"></textarea>
         <div class="actions">
           <button type="button" class="btn-quiet" id="paste-load" disabled>Load into solver</button>
-          <button type="button" class="btn-quiet" id="paste-clear" disabled>Clear log</button>
+          <button type="button" class="btn-quiet" id="paste-clear" disabled>Clear Config Hack log</button>
         </div>
         <p class="move-note" id="paste-summary" role="status"></p>
         <ol class="answers" id="paste-problems" role="list"></ol>
@@ -238,7 +238,7 @@
         <label class="visually-hidden" for="log-input">Log lines</label>
         <textarea class="log-input" id="log-input" rows="6" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="[14:03:22] SCAN /sector=12 /status=OK"></textarea>
         <div class="actions">
-          <button type="button" class="btn-quiet" id="log-clear" disabled>Clear log</button>
+          <button type="button" class="btn-quiet" id="log-clear" disabled>Clear log lines</button>
         </div>
         <p class="move-note" id="log-summary" role="status"></p>
         <ol class="answers" id="log-lines" role="list"></ol>
