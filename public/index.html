@@ -4,18 +4,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta name="description" content="Solves the Cor3.gg Mastermind minigame in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Unofficial fan tool." />
+    <meta name="description" content="Solves the Cor3.gg Mastermind minigame (Config Hack) in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Also checks System Log Integrity lines and decodes Signal Hack pulses. Unofficial fan tool." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://cor3.azd325.com/" />
-    <meta property="og:title" content="Cor3.gg Mastermind Solver — Cleaner Bot minigame" />
-    <meta property="og:description" content="Solves the Cor3.gg Mastermind minigame in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Unofficial fan tool." />
+    <meta property="og:title" content="Cor3.gg Mastermind, Log Integrity and Signal Hack Solver" />
+    <meta property="og:description" content="Solves the Cor3.gg Mastermind minigame (Config Hack) in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Also checks System Log Integrity lines and decodes Signal Hack pulses. Unofficial fan tool." />
     <meta property="og:image" content="https://cor3.azd325.com/og-image.png?v=2" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Cor3.gg Mastermind Solver — Cleaner Bot minigame" />
-    <meta name="twitter:description" content="Solves the Cor3.gg Mastermind minigame in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Unofficial fan tool." />
-    <title>Cor3.gg Mastermind Solver — Cleaner Bot minigame</title>
+    <meta name="twitter:title" content="Cor3.gg Mastermind, Log Integrity and Signal Hack Solver" />
+    <meta name="twitter:description" content="Solves the Cor3.gg Mastermind minigame (Config Hack) in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Also checks System Log Integrity lines and decodes Signal Hack pulses. Unofficial fan tool." />
+    <title>Cor3.gg Mastermind, Log Integrity and Signal Hack Solver</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -33,15 +33,23 @@
         "operatingSystem": "Any",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-        "description": "Solves the Cor3.gg Mastermind minigame in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Unofficial fan tool."
+        "description": "Solves the Cor3.gg Mastermind minigame (Config Hack) in the Cleaner Bot (Space Roomba) stage and decrypt jobs: pick Version, Method, Channel and Cipher. Also checks System Log Integrity lines and decodes Signal Hack pulses. Unofficial fan tool."
       }
     </script>
     <script type="module" src="app.js"></script>
+    <script type="module" src="jump.js"></script>
   </head>
   <body>
     <main class="app">
-      <header class="bar">
+      <header class="bar" id="config-hack">
         <h1 class="wordmark">Mastermind solver</h1>
+        <nav class="jump" aria-label="Solvers">
+          <ul role="list">
+            <li><a href="#config-hack">Config Hack</a></li>
+            <li><a href="#log-integrity">Log Integrity</a></li>
+            <li><a href="#signal-hack">Signal Hack</a></li>
+          </ul>
+        </nav>
         <dl class="score">
           <div>
             <dt>attempts left</dt>
@@ -137,8 +145,8 @@
         <ol class="log-lines" id="paste-problems" role="list"></ol>
       </details>
 
-      <section class="panel" aria-labelledby="candidates-title">
-        <h2 id="candidates-title">Possible targets</h2>
+      <details class="panel manual" id="targets">
+        <summary>Possible targets</summary>
         <ul class="candidates" id="candidates" role="list">
           <li class="pick">v1.0 GET LTE AES</li>
           <li>v1.0 GET LTE RSA</li>
@@ -222,9 +230,9 @@
           <li>v2.0 POST Sat RSA</li>
           <li>v2.0 POST Sat DES</li>
         </ul>
-      </section>
+      </details>
 
-      <section class="panel logcheck" aria-labelledby="log-title">
+      <section class="panel logcheck" id="log-integrity" aria-labelledby="log-title">
         <h2 id="log-title">System Log Integrity</h2>
         <p class="manual-help">Paste the log lines from the System Log Integrity puzzle, one per line. Each faulty line shows the error button to press. The two lines with the most faults are the pair to pick.</p>
         <label class="visually-hidden" for="log-input">Log lines</label>
@@ -240,7 +248,7 @@
         <ol class="log-lines" id="log-lines" role="list"></ol>
       </section>
 
-      <section class="panel logcheck" aria-labelledby="signal-title">
+      <section class="panel logcheck" id="signal-hack" aria-labelledby="signal-title">
         <h2 id="signal-title">Signal Hack decoder</h2>
         <p class="manual-help">Paste the pulses from the Signal Hack puzzle as S for short and L for long, for example SSSLSLLS. The page shows each reading that fits.</p>
         <label class="visually-hidden" for="signal-input">Pulses</label>
