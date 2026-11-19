@@ -318,7 +318,7 @@ function restoreFocus(id) {
 }
 
 document.addEventListener("keydown", (event) => {
-  if (event.target.closest?.("textarea")) return;
+  if (event.target.closest?.("textarea, .logcheck, .faq, .foot")) return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
   const inManual = Boolean(event.target.closest?.("#manual"));

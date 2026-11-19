@@ -290,6 +290,36 @@ test("solver keys typed in the log box do not log a move", async () => {
   assert.match(historyRows()[0], /Not played/);
 });
 
+for (const [panel, control] of [
+  ["System Log Integrity", "#log-clear"],
+  ["System Log Integrity", "#log-title ~ details summary"],
+  ["Signal Hack", "#signal-clear"],
+  ["Signal Hack", "#signal-title ~ details summary"],
+]) {
+  test(`solver keys on a focused control in ${panel} (${control}) leave the round alone`, async () => {
+    const { document, press, text, historyRows } = await openApp();
+    press("2");
+    const before = { title: text("#move-title"), rows: historyRows() };
+    assert.equal(before.title, "Attempt 2 of 6");
+    const target = document.querySelector(control);
+    for (const key of ["Backspace", "3", "n", "u"]) press(key, target);
+    assert.equal(text("#move-title"), "Attempt 2 of 6");
+    assert.deepEqual(historyRows(), before.rows);
+  });
+}
+
+test("solver keys still work from the body: a digit logs, Backspace undoes, N resets", async () => {
+  const { press, text, historyRows } = await openApp();
+  press("2");
+  assert.equal(text("#move-title"), "Attempt 2 of 6");
+  press("Backspace");
+  assert.equal(text("#move-title"), "Attempt 1 of 6");
+  press("2");
+  press("n");
+  assert.equal(text("#move-title"), "Attempt 1 of 6");
+  assert.match(historyRows()[0], /Not played/);
+});
+
 test("pasted pulses show the one reading that fits", async () => {
   const { document, text } = await openApp();
   const input = document.querySelector("#signal-input");
