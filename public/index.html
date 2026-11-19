@@ -227,6 +227,22 @@
         <ol class="log-lines" id="log-lines" role="list"></ol>
       </section>
 
+      <section class="panel logcheck" aria-labelledby="signal-title">
+        <h2 id="signal-title">Signal Hack decoder</h2>
+        <p class="manual-help">Paste the pulses from the Signal Hack puzzle as S for short and L for long, for example SSSLSLLS. The page shows each reading that fits.</p>
+        <label class="visually-hidden" for="signal-input">Pulses</label>
+        <textarea class="log-input" id="signal-input" rows="3" spellcheck="false" autocomplete="off" autocapitalize="characters" placeholder="SSSLSLLSLSSS"></textarea>
+        <div class="actions">
+          <button type="button" class="btn-quiet" id="signal-clear" disabled>Clear pulses</button>
+        </div>
+        <details class="manual">
+          <summary>How the decoder reads pulses</summary>
+          <p class="manual-help">Morse reads groups of 5 pulses and binary reads groups of 4. A reading counts only when the pulse count divides by the group size and every group is a digit from 0 to 9. When 40 pulses fit both, the game uses binary, so only binary shows. Any other pulse count that fits both shows both readings, and the page cannot decide between them.</p>
+        </details>
+        <p class="move-note" id="signal-summary" role="status"></p>
+        <ul class="log-lines" id="signal-readings" role="list"></ul>
+      </section>
+
       <section class="panel faq" aria-labelledby="how-title">
         <h2 id="how-title">How it works</h2>
         <details class="manual">

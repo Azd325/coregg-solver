@@ -289,3 +289,39 @@ test("solver keys typed in the log box do not log a move", async () => {
   for (const key of ["0", "2", "n", "u"]) press(key, input);
   assert.match(historyRows()[0], /Not played/);
 });
+
+test("pasted pulses show the one reading that fits", async () => {
+  const { document, text } = await openApp();
+  const input = document.querySelector("#signal-input");
+  input.value = "SSSL SLLS LSSS";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#signal-summary"), "12 pulses read as Binary.");
+  assert.deepEqual([...document.querySelectorAll("#signal-readings li")].map((row) => row.textContent), ["168Binary"]);
+  assert.equal(document.querySelector("#signal-clear").disabled, false);
+});
+
+test("40 pulses that fit both maps show only binary, other double matches show both", async () => {
+  const { document, text } = await openApp();
+  const input = document.querySelector("#signal-input");
+  const rows = () => [...document.querySelectorAll("#signal-readings li")].map((row) => row.textContent);
+  input.value = "S".repeat(40);
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#signal-summary"), "40 pulses fit both. The game uses binary here.");
+  assert.deepEqual(rows(), ["0000000000Binary"]);
+  input.value = "S".repeat(20);
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#signal-summary"), "20 pulses fit both. The pulses alone cannot decide.");
+  assert.deepEqual(rows(), ["5555Morse", "00000Binary"]);
+});
+
+test("bad pulse input explains itself and shows no reading", async () => {
+  const { document, text } = await openApp();
+  const input = document.querySelector("#signal-input");
+  input.value = "SS?L";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#signal-summary"), "Only S and L count. Remove: ?.");
+  assert.equal(document.querySelectorAll("#signal-readings li").length, 0);
+  input.value = "SSSSSS";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#signal-summary"), "6 pulses fit no Morse code and no binary code. Check the pulses.");
+});
