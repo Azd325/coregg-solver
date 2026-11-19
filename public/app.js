@@ -1,3 +1,4 @@
+import { parseConfigLog } from "./configlog.js";
 import { checkLog } from "./logcheck.js";
 import { decodeSignal } from "./signal.js";
 import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, guessesNeeded, play, roundState } from "./solver.js";
@@ -246,6 +247,46 @@ function renderLog() {
   );
 }
 
+function readPaste() {
+  return parseConfigLog($("paste-input").value, MAX_LIMIT);
+}
+
+function renderPaste() {
+  const text = $("paste-input").value;
+  const { history: moves, problems } = readPaste();
+  const loadable = moves.length > 0 && problems.length === 0;
+  $("paste-clear").disabled = text === "";
+  $("paste-load").disabled = !loadable;
+  const note = $("paste-summary");
+  note.classList.toggle("error", problems.length > 0);
+  if (problems.length) note.textContent = `${plural(problems.length, "line needs", "lines need")} a fix. Nothing loads until the log is clear.`;
+  else if (text.trim() === "") note.textContent = "";
+  else if (!moves.length) note.textContent = "No Input and Mismatched lines found.";
+  else note.textContent = `${plural(moves.length, "move", "moves")} read. Press Load into solver.`;
+  $("paste-problems").replaceChildren(
+    ...problems.map(({ number, text: line, reason }) => {
+      const item = element("li", "log-line faulty");
+      item.append(element("span", "log-text", line ? `${number}. ${line}` : `Line ${number}`), element("span", "", reason));
+      return item;
+    }),
+  );
+}
+
+function loadPaste() {
+  const { history: moves, limit: parsed, problems } = readPaste();
+  if (!moves.length || problems.length) return;
+  if (history.length > 0) previousRound = { history, limit };
+  history = moves;
+  limit = Math.max(parsed ?? limit, moves.length);
+  conflict = "";
+  state = roundState(history, limit);
+  resetManual();
+  $("paste-input").value = "";
+  render();
+  renderPaste();
+  $("paste-summary").textContent = `Loaded ${plural(moves.length, "move", "moves")}.`;
+}
+
 const SIGNAL_NOTES = {
   empty: () => "",
   invalid: ({ invalid }) => `Only S and L count. Remove: ${invalid.join(" ")}.`,
@@ -303,6 +344,13 @@ $("log-clear").addEventListener("click", () => {
   $("log-input").value = "";
   renderLog();
   $("log-input").focus();
+});
+$("paste-input").addEventListener("input", renderPaste);
+$("paste-load").addEventListener("click", loadPaste);
+$("paste-clear").addEventListener("click", () => {
+  $("paste-input").value = "";
+  renderPaste();
+  $("paste-input").focus();
 });
 $("signal-input").addEventListener("input", renderSignal);
 $("signal-clear").addEventListener("click", () => {

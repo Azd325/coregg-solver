@@ -124,6 +124,19 @@
         <p class="move-note error" id="manual-note" role="status"></p>
       </details>
 
+      <details class="panel manual" id="paste">
+        <summary>Paste the game log</summary>
+        <p class="manual-help">Copy the Config Hack log from the game and paste it here to take over a round that is already running. The page reads each Input and Mismatched line and the Attempts line. It loads nothing while a line is unclear.</p>
+        <label class="visually-hidden" for="paste-input">Config Hack log</label>
+        <textarea class="log-input" id="paste-input" rows="6" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Input: v1.0 GET LTE AES&#10;Result:&#10;Mismatched 2"></textarea>
+        <div class="actions">
+          <button type="button" class="btn-quiet" id="paste-load" disabled>Load into solver</button>
+          <button type="button" class="btn-quiet" id="paste-clear" disabled>Clear log</button>
+        </div>
+        <p class="move-note" id="paste-summary" role="status"></p>
+        <ol class="log-lines" id="paste-problems" role="list"></ol>
+      </details>
+
       <section class="panel" aria-labelledby="candidates-title">
         <h2 id="candidates-title">Possible targets</h2>
         <ul class="candidates" id="candidates" role="list">

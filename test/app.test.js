@@ -325,3 +325,46 @@ test("bad pulse input explains itself and shows no reading", async () => {
   input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
   assert.equal(text("#signal-summary"), "6 pulses fit no Morse code and no binary code. Check the pulses.");
 });
+
+async function paste(app, log) {
+  const input = app.document.getElementById("paste-input");
+  input.value = log;
+  input.dispatchEvent(new app.document.defaultView.Event("input", { bubbles: true }));
+}
+
+test("a pasted log loads into the history and sets attempts from the Attempts line", async () => {
+  const app = await openApp();
+  await paste(app, "Attempts: 4\nInput: v1.0 GET LTE AES\nResult:\nMismatched 2\nInput: v1.1 PUT Fiber RSA Result: Mismatched 3");
+  assert.equal(app.text("#paste-summary"), "2 moves read. Press Load into solver.");
+  app.document.getElementById("paste-load").click();
+  const rows = app.historyRows();
+  assert.equal(rows.length, 4);
+  assert.match(rows[0], /^1v1\.0 GET LTE AES2/);
+  assert.match(rows[1], /^2v1\.1 PUT Fiber RSA3/);
+  assert.equal(app.text("#tries"), "2");
+  assert.equal(app.text("#move-title"), "Attempt 3 of 4");
+  assert.equal(app.document.getElementById("paste-input").value, "");
+});
+
+test("a pasted log with an unreadable line loads nothing and names the line", async () => {
+  const app = await openApp();
+  await paste(app, "Input: v1.0 GET LTE AES Result: Mismatched 2\nwhat is this");
+  assert.equal(app.document.getElementById("paste-load").disabled, true);
+  assert.equal(app.text("#paste-summary"), "1 line needs a fix. Nothing loads until the log is clear.");
+  assert.equal(app.text("#paste-problems"), "2. what is thisnot an Input, Result, Mismatched, Attempts or option line");
+  app.document.getElementById("paste-load").click();
+  assert.match(app.historyRows()[0], /Not played/);
+});
+
+test("Undo after a pasted log removes the last pasted move, and a loaded log keeps the earlier round", async () => {
+  const app = await openApp();
+  app.press("1");
+  await paste(app, "Input: v1.0 GET LTE AES Result: Mismatched 2\nInput: v1.1 PUT Fiber RSA Result: Mismatched 3");
+  app.document.getElementById("paste-load").click();
+  app.press("u");
+  assert.match(app.historyRows()[1], /Not played/);
+  app.press("u");
+  assert.match(app.historyRows()[0], /Not played/);
+  app.press("u");
+  assert.match(app.historyRows()[0], /^1v1\.0 GET LTE AES1/);
+});

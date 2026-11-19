@@ -28,6 +28,8 @@ Keep the solver open next to the game:
 
 To take over a round that is already running, or to try a move of your own, open **Log a different move**. Pick the four fields, then tap the mismatch count. Set attempts left to what the game shows when you join a round that is already running. If an entry leaves no possible target, the solver shows a conflict and keeps the last valid state.
 
+To take over a round from the game's log, open **Paste the game log** and paste the Config Hack log. The page reads each `Input:` line with its `Result:` and `Mismatched N`, in the game's split lines or on one line, and an `Attempts:` line. `Attempts: used/total` sets the total. A bare `Attempts: N` sets it only before the first move. A line the page cannot read, a move that no target fits, or a move after a hit is listed with its line number, and nothing loads until the log is clear.
+
 ## System Log Integrity
 
 Paste the log lines from the System Log Integrity puzzle into **System Log Integrity**. Each faulty line shows the error button to press and the bad token. The two lines with the most faults are marked as the pair to pick. A line is valid when it reads `[HH:MM:SS] TYPE /sector=N /status=S` with a type from `AUTH`, `TEMP-SYNC`, `SCAN`, `ROUTE-CHECK`, `RADIO-TEST`, `PING`, `SYNC`, a sector from 1 to 256 and a status of `OK`, `WARN` or `ERROR`.
