@@ -398,3 +398,54 @@ test("Undo after a pasted log removes the last pasted move, and a loaded log kee
   app.press("u");
   assert.match(app.historyRows()[0], /^1v1\.0 GET LTE AES1/);
 });
+
+test("jump row links point at the three solver sections in order", () => {
+  const { document } = new JSDOM(html).window;
+  const links = [...document.querySelectorAll('nav[aria-label="Solvers"] ul[role="list"] a')];
+  assert.deepEqual(
+    links.map((a) => [a.textContent, a.getAttribute("href")]),
+    [
+      ["Config Hack", "#config-hack"],
+      ["Log Integrity", "#log-integrity"],
+      ["Signal Hack", "#signal-hack"],
+    ],
+  );
+  for (const a of links) assert.ok(document.querySelector(a.getAttribute("href")), a.getAttribute("href"));
+  assert.equal(document.querySelector("h1").textContent, "Mastermind solver");
+  assert.equal(document.getElementById("log-title").textContent, "System Log Integrity");
+  assert.equal(document.getElementById("signal-title").textContent, "Signal Hack decoder");
+});
+
+test("jump row marks only the link matching the hash, and follows hashchange", async () => {
+  const dom = new JSDOM(html, { url: "https://example.test/#signal-hack" });
+  const { document } = dom.window;
+  globalThis.document = document;
+  globalThis.location = dom.window.location;
+  globalThis.addEventListener = dom.window.addEventListener.bind(dom.window);
+  await import("../public/jump.js?case=jump");
+  const current = () => [...document.querySelectorAll(".jump a[aria-current]")].map((a) => [a.textContent, a.getAttribute("aria-current")]);
+  assert.deepEqual(current(), [["Signal Hack", "location"]]);
+  dom.window.location.hash = "#log-integrity";
+  await new Promise((resolve) => dom.window.addEventListener("hashchange", resolve, { once: true }));
+  assert.deepEqual(current(), [["Log Integrity", "location"]]);
+  dom.window.location.hash = "";
+  await new Promise((resolve) => dom.window.addEventListener("hashchange", resolve, { once: true }));
+  assert.deepEqual(current(), []);
+});
+
+test("possible targets sit in a closed disclosure and the score bar keeps the count", async () => {
+  const { document, text } = await openApp();
+  const targets = document.getElementById("targets");
+  assert.equal(targets.tagName, "DETAILS");
+  assert.equal(targets.hasAttribute("open"), false);
+  assert.equal(targets.querySelector("summary").textContent, "Possible targets");
+  assert.ok(targets.contains(document.getElementById("candidates")));
+  assert.equal(text("#count"), "81");
+});
+
+test("title and meta name all three solvers", () => {
+  const { document } = new JSDOM(html).window;
+  assert.equal(document.title, "Cor3.gg Mastermind, Log Integrity and Signal Hack Solver");
+  const description = document.querySelector('meta[name="description"]').content;
+  for (const name of ["Config Hack", "System Log Integrity", "Signal Hack"]) assert.ok(description.includes(name), name);
+});

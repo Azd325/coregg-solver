@@ -707,3 +707,43 @@ kbd {
     translate: none;
   }
 }
+
+.jump ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jump a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-xs);
+  border: var(--rule-hair) solid var(--color-muted);
+  border-radius: var(--radius-card);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease-out);
+}
+
+.jump a:hover {
+  background: var(--color-paper-3);
+}
+
+.jump a:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.jump a[aria-current="location"] {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent-2);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.3em;
+}
