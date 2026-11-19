@@ -276,7 +276,7 @@ function renderPaste() {
   else note.textContent = `${plural(moves.length, "move", "moves")} read. Press Load into solver.`;
   $("paste-problems").replaceChildren(
     ...problems.map(({ number, text: line, reason }) =>
-      answerItem("", element("span", "log-text", line ? `${number}. ${line}` : `Line ${number}`), element("span", "", reason)),
+      answerItem("", element("span", "log-text", line ? `${number}. ${line}` : `Line ${number}`), element("span", "answer-reason", reason)),
     ),
   );
 }

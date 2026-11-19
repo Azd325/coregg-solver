@@ -105,3 +105,16 @@ test("a move after the hit that is also over the attempts total is flagged once"
   const move = "Input: v1.0 GET LTE AES Result: Mismatched 0";
   assert.deepEqual(problemLines(`Attempts: 1/1\n${move}\n${move}`), [3]);
 });
+
+const reasons = (text) => parse(text).problems.map(({ reason }) => reason);
+
+test("a bad input value is named by its field", () => {
+  assert.deepEqual(reasons("Input: v1.0 PUTT LTE AES Result: Mismatched 2"), ["PUTT is not a Method"]);
+  assert.deepEqual(reasons("Input: v3.0 GET LTE AES Result: Mismatched 2"), ["v3.0 is not a Version"]);
+  assert.deepEqual(reasons("Input: v1.0 GET LTE AED Result: Mismatched 2"), ["AED is not a Cipher"]);
+});
+
+test("an input with the wrong number of values names the four fields", () => {
+  assert.deepEqual(reasons("Input: v1.0 GET LTE Result: Mismatched 2"), ["v1.0 GET LTE needs Version Method Channel Cipher"]);
+  assert.deepEqual(reasons("Input: Result: Mismatched 2"), ["empty input needs Version Method Channel Cipher"]);
+});

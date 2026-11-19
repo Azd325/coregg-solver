@@ -386,6 +386,10 @@ kbd {
   gap: var(--space-xs);
 }
 
+.actions > :only-child {
+  grid-column: 1 / -1;
+}
+
 .btn-quiet {
   display: inline-flex;
   align-items: center;
@@ -621,13 +625,19 @@ kbd {
   border-radius: var(--radius-card);
   background: var(--color-paper-2);
   color: var(--color-ink);
-  font-family: ui-monospace, monospace;
-  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
   resize: vertical;
 }
 
+.manual > summary > h2 {
+  max-width: none;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .logcheck > h2,
-#paste > summary {
+#paste > summary > h2 {
   font-size: var(--text-lg);
 }
 
@@ -674,6 +684,15 @@ kbd {
   color: var(--color-accent-ink);
 }
 
+.answer-reason,
+.log-valid {
+  font-size: var(--text-sm);
+}
+
+.answer-reason {
+  color: var(--color-error);
+}
+
 .answer-tag {
   font-family: var(--font-body);
   font-weight: 700;
@@ -681,7 +700,7 @@ kbd {
 }
 
 .log-text {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }

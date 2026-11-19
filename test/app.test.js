@@ -478,3 +478,29 @@ test("title and meta name all three solvers", () => {
   const description = document.querySelector('meta[name="description"]').content;
   for (const name of ["Config Hack", "System Log Integrity", "Signal Hack"]) assert.ok(description.includes(name), name);
 });
+
+test("a pasted log names the bad field and styles the reason", async () => {
+  const app = await openApp();
+  await paste(app, "Input: v1.0 PUTT LTE AES Result: Mismatched 2");
+  assert.equal(app.text("#paste-problems .answer-reason"), "PUTT is not a Method");
+});
+
+test("the two clear buttons have different names", async () => {
+  const { document } = await openApp();
+  assert.equal(document.getElementById("paste-clear").textContent, "Clear Config Hack log");
+  assert.equal(document.getElementById("log-clear").textContent, "Clear log lines");
+});
+
+test("the paste and manual disclosures have a heading inside the summary", async () => {
+  const { document } = await openApp();
+  assert.equal(document.querySelector("#manual > summary > h2").textContent, "Log a different move");
+  assert.equal(document.querySelector("#paste > summary > h2").textContent, "Paste the game log");
+});
+
+test("a faultless log line is marked with the No faults class", async () => {
+  const { document } = await openApp();
+  const input = document.querySelector("#log-input");
+  input.value = "[14:03:22] SCAN /sector=12 /status=OK";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(document.querySelector("#log-lines .log-valid").textContent, "No faults");
+});

@@ -6,6 +6,6 @@
   },
   "routes": [{ "pattern": "cor3.azd325.com", "custom_domain": true }],
   "workers_dev": false,
-  "preview_urls": true,
+  "preview_urls": false,
   "previews": {}
 }
