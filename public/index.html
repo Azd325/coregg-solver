@@ -142,7 +142,7 @@
           <button type="button" class="btn-quiet" id="paste-clear" disabled>Clear log</button>
         </div>
         <p class="move-note" id="paste-summary" role="status"></p>
-        <ol class="log-lines" id="paste-problems" role="list"></ol>
+        <ol class="answers" id="paste-problems" role="list"></ol>
       </details>
 
       <details class="panel manual" id="targets">
@@ -240,12 +240,12 @@
         <div class="actions">
           <button type="button" class="btn-quiet" id="log-clear" disabled>Clear log</button>
         </div>
+        <p class="move-note" id="log-summary" role="status"></p>
+        <ol class="answers" id="log-lines" role="list"></ol>
         <details class="manual">
           <summary>How the checker judges a line</summary>
           <p class="manual-help">A valid line reads [HH:MM:SS] TYPE /sector=N /status=S. Hour is 00 to 23, minute and second 00 to 59, and a space follows the closing bracket. TYPE is AUTH, TEMP-SYNC, SCAN, ROUTE-CHECK, RADIO-TEST, PING or SYNC in upper case. N is a whole number from 1 to 256. S is OK, WARN or ERROR. A line has at most one fault per rule, and the pick is the two lines with the most faults. When two lines tie for second place, the earlier line is marked.</p>
         </details>
-        <p class="move-note" id="log-summary" role="status"></p>
-        <ol class="log-lines" id="log-lines" role="list"></ol>
       </section>
 
       <section class="panel logcheck" id="signal-hack" aria-labelledby="signal-title">
@@ -256,12 +256,12 @@
         <div class="actions">
           <button type="button" class="btn-quiet" id="signal-clear" disabled>Clear pulses</button>
         </div>
+        <p class="move-note" id="signal-summary" role="status"></p>
+        <ul class="answers" id="signal-readings" role="list"></ul>
         <details class="manual">
           <summary>How the decoder reads pulses</summary>
           <p class="manual-help">Morse reads groups of 5 pulses and binary reads groups of 4. A reading counts only when the pulse count divides by the group size and every group is a digit from 0 to 9. When 40 pulses fit both, the game uses binary, so only binary shows. Any other pulse count that fits both shows both readings, and the page cannot decide between them.</p>
         </details>
-        <p class="move-note" id="signal-summary" role="status"></p>
-        <ul class="log-lines" id="signal-readings" role="list"></ul>
       </section>
 
       <section class="panel faq" aria-labelledby="how-title">

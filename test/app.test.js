@@ -266,12 +266,39 @@ test("pasted log lines list each fault and mark the worst two lines", async () =
   const input = document.querySelector("#log-input");
   input.value = "[14:03:22] SCAN /sector=12 /status=OK\n[25:03:22] SCAN /sector=0 /status=OK\n[14:03:22] SYNC\n[14:03:22] PING /sector=1 /status=BAD";
   input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
-  assert.equal(text("#log-summary"), "4 lines checked, 3 faulty lines.");
-  const rows = [...document.querySelectorAll("#log-lines li.log-line")];
-  assert.deepEqual(rows.map((row) => row.classList.contains("pick")), [false, true, true, false]);
+  assert.equal(text("#log-summary"), "Pick lines 2 and 3.");
+  const rows = [...document.querySelectorAll("#log-lines li.answer")];
+  assert.deepEqual(rows.map((row) => row.className), ["answer valid", "answer pick", "answer pick", "answer"]);
   assert.match(rows[1].textContent, /Time format is incorrect \(hour 25\)/);
   assert.match(rows[1].textContent, /\/sector parameter is incorrect \(sector 0\)/);
   assert.match(rows[3].textContent, /\/status parameter is incorrect \(status BAD\)/);
+});
+
+test("a log with one faulty line names that line, and a clean log names no pair", async () => {
+  const { document, text } = await openApp();
+  const input = document.querySelector("#log-input");
+  const type = () => input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  input.value = "[25:00:00] SCAN /sector=12 /status=OK";
+  type();
+  assert.equal(text("#log-summary"), "Pick line 1.");
+  input.value = "[14:03:22] SCAN /sector=12 /status=OK";
+  type();
+  assert.equal(text("#log-summary"), "1 line checked, 0 faulty lines.");
+});
+
+test("solver results sit under the input and the help closes the panel", async () => {
+  const { document } = await openApp();
+  const following = document.defaultView.Node.DOCUMENT_POSITION_FOLLOWING;
+  for (const [panelId, summaryId, resultsId] of [
+    ["log-integrity", "log-summary", "log-lines"],
+    ["signal-hack", "signal-summary", "signal-readings"],
+  ]) {
+    const panel = document.getElementById(panelId);
+    const help = panel.querySelector("details");
+    assert.equal(panel.lastElementChild, help);
+    assert.ok(document.getElementById(summaryId).compareDocumentPosition(help) & following);
+    assert.ok(document.getElementById(resultsId).compareDocumentPosition(help) & following);
+  }
 });
 
 test("pasted text is shown as text, never as markup", async () => {
@@ -325,7 +352,8 @@ test("pasted pulses show the one reading that fits", async () => {
   const input = document.querySelector("#signal-input");
   input.value = "SSSL SLLS LSSS";
   input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
-  assert.equal(text("#signal-summary"), "12 pulses read as Binary.");
+  assert.equal(text("#signal-summary"), "Binary: 168");
+  assert.equal(document.querySelector("#signal-readings li").className, "answer pick");
   assert.deepEqual([...document.querySelectorAll("#signal-readings li")].map((row) => row.textContent), ["168Binary"]);
   assert.equal(document.querySelector("#signal-clear").disabled, false);
 });
@@ -336,11 +364,11 @@ test("40 pulses that fit both maps show only binary, other double matches show b
   const rows = () => [...document.querySelectorAll("#signal-readings li")].map((row) => row.textContent);
   input.value = "S".repeat(40);
   input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
-  assert.equal(text("#signal-summary"), "40 pulses fit both. The game uses binary here.");
+  assert.equal(text("#signal-summary"), "Binary: 0000000000. 40 pulses fit both. The game uses binary here.");
   assert.deepEqual(rows(), ["0000000000Binary"]);
   input.value = "S".repeat(20);
   input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
-  assert.equal(text("#signal-summary"), "20 pulses fit both. The pulses alone cannot decide.");
+  assert.equal(text("#signal-summary"), "Morse: 5555. Binary: 00000. 20 pulses fit both. The pulses alone cannot decide.");
   assert.deepEqual(rows(), ["5555Morse", "00000Binary"]);
 });
 
@@ -381,6 +409,7 @@ test("a pasted log with an unreadable line loads nothing and names the line", as
   await paste(app, "Input: v1.0 GET LTE AES Result: Mismatched 2\nwhat is this");
   assert.equal(app.document.getElementById("paste-load").disabled, true);
   assert.equal(app.text("#paste-summary"), "1 line needs a fix. Nothing loads until the log is clear.");
+  assert.equal(app.document.querySelector("#paste-problems li").className, "answer");
   assert.equal(app.text("#paste-problems"), "2. what is thisnot an Input, Result, Mismatched, Attempts or option line");
   app.document.getElementById("paste-load").click();
   assert.match(app.historyRows()[0], /Not played/);
