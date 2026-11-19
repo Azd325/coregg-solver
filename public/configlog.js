@@ -6,20 +6,12 @@ const ENTRY = /^Input:\s*(.*?)\s*Result:\s*Mismatched\s*(\d+)$/i;
 const OPTIONS = /^→\s*(.+)$/;
 const ATTEMPTS = /^Attempts:\s*(\d+)(?:\s*\/\s*(\d+))?\s*$/i;
 
-const lower = (values) => values.map((value) => value.toLowerCase());
-const KNOWN_OPTIONS = FIELDS.map((field) => lower(field.values).sort().join("/"));
-
 function comboFrom(text) {
   const words = text.split(/\s+/).filter(Boolean);
   if (words.length !== FIELDS.length) return null;
   const values = words.map((word, f) => FIELDS[f].values.findIndex((value) => value.toLowerCase() === word.toLowerCase()));
   if (values.includes(-1)) return null;
   return COMBOS.findIndex((combo) => combo.every((v, f) => v === values[f]));
-}
-
-function knownOptions(text) {
-  const values = text.split("/").map((value) => value.trim().toLowerCase());
-  return KNOWN_OPTIONS.includes([...values].sort().join("/"));
 }
 
 export function parseConfigLog(text, maxLimit) {
@@ -59,11 +51,7 @@ export function parseConfigLog(text, maxLimit) {
         pending = { number, parts: [line] };
         return;
       }
-      const options = line.match(OPTIONS);
-      if (options) {
-        if (!knownOptions(options[1])) problem(number, line, "these options are not one of the four known fields");
-        return;
-      }
+      if (OPTIONS.test(line)) return;
       const attempts = line.match(ATTEMPTS);
       if (attempts) {
         const total = Number(attempts[2] ?? attempts[1]);
@@ -90,7 +78,7 @@ export function parseConfigLog(text, maxLimit) {
     }
   }
   if (limit !== null && entries.length > limit) problem(entries[limit].number, "", `${entries.length} moves do not fit in ${limit} attempts`);
-  if (entries.length > maxLimit) problem(entries[maxLimit].number, "", `more than ${maxLimit} moves`);
+  else if (entries.length > maxLimit) problem(entries[maxLimit].number, "", `more than ${maxLimit} moves`);
 
   problems.sort((a, b) => a.number - b.number);
   return { history, limit, problems };

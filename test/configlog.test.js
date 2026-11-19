@@ -45,10 +45,14 @@ test("an Attempts total outside 1 to the maximum is a problem", () => {
   assert.deepEqual(problemLines("Attempts: 8"), []);
 });
 
-test("option lines of the known four fields are ignored and other option lines are flagged", () => {
+test("option lines are ignored, known or not", () => {
   const known = "→ v1.0 / v1.1 / v2.0\n→ GET / PUT / POST\n→ LTE / Fiber / Sat\n→ AES / RSA / DES";
   assert.deepEqual(parse(known), { history: [], limit: null, problems: [] });
-  assert.deepEqual(problemLines("→ v1.0 / v1.1 / v2.0\n→ red / green / blue"), [2]);
+  assert.deepEqual(parse("→ red / green / blue\nInput: v1.0 GET LTE AES Result: Mismatched 2"), {
+    history: [{ guess: 0, feedback: 2 }],
+    limit: null,
+    problems: [],
+  });
 });
 
 test("a line the parser cannot read is flagged with its line number", () => {
@@ -89,4 +93,10 @@ test("a slash Attempts total smaller than the moves played is flagged", () => {
 
 test("empty text reads as nothing", () => {
   assert.deepEqual(parse(""), { history: [], limit: null, problems: [] });
+});
+
+test("one line over both the attempts and the maximum is flagged once", () => {
+  const move = "Input: v1.0 GET LTE AES Result: Mismatched 2";
+  const log = ["Attempts: 8/8", ...Array(9).fill(move)].join("\n");
+  assert.equal(problemLines(log).filter((number) => number === 10).length, 1);
 });
