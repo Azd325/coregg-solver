@@ -218,19 +218,30 @@ function render() {
   restoreFocus(focusedId);
 }
 
+function logStatus(lines) {
+  const picks = lines.filter((line) => line.pick).map((line) => line.number);
+  if (picks.length === 2) return `Pick lines ${picks[0]} and ${picks[1]}.`;
+  if (picks.length === 1) return `Pick line ${picks[0]}.`;
+  const faulty = lines.filter((line) => line.faults.length).length;
+  return `${plural(lines.length, "line", "lines")} checked, ${plural(faulty, "faulty line", "faulty lines")}.`;
+}
+
+function answerItem(kind, ...nodes) {
+  const item = element("li", kind ? `answer ${kind}` : "answer");
+  item.append(...nodes);
+  return item;
+}
+
 function renderLog() {
   const text = $("log-input").value;
   const lines = checkLog(text);
-  const faulty = lines.filter((line) => line.faults.length).length;
   $("log-clear").disabled = text === "";
-  $("log-summary").textContent = lines.length
-    ? `${plural(lines.length, "line", "lines")} checked, ${plural(faulty, "faulty line", "faulty lines")}.`
-    : "";
+  $("log-summary").textContent = lines.length ? logStatus(lines) : "";
   $("log-lines").replaceChildren(
     ...lines.map((line) => {
-      const item = element("li", `log-line ${line.faults.length ? "faulty" : "valid"}${line.pick ? " pick" : ""}`);
-      item.append(element("span", "log-text", `${line.number}. ${line.text}`));
-      if (line.pick) item.append(element("span", "log-tag", "Pick this line"));
+      const kind = line.pick ? "pick" : line.faults.length ? "" : "valid";
+      const item = answerItem(kind, element("span", "log-text", `${line.number}. ${line.text}`));
+      if (line.pick) item.append(element("span", "answer-tag", "Pick this line"));
       if (!line.faults.length) item.append(element("span", "log-valid", "No faults"));
       else {
         const faults = element("ul", "log-faults");
@@ -264,11 +275,9 @@ function renderPaste() {
   else if (!moves.length) note.textContent = "No Input and Mismatched lines found.";
   else note.textContent = `${plural(moves.length, "move", "moves")} read. Press Load into solver.`;
   $("paste-problems").replaceChildren(
-    ...problems.map(({ number, text: line, reason }) => {
-      const item = element("li", "log-line faulty");
-      item.append(element("span", "log-text", line ? `${number}. ${line}` : `Line ${number}`), element("span", "", reason));
-      return item;
-    }),
+    ...problems.map(({ number, text: line, reason }) =>
+      answerItem("", element("span", "log-text", line ? `${number}. ${line}` : `Line ${number}`), element("span", "", reason)),
+    ),
   );
 }
 
@@ -287,13 +296,15 @@ function loadPaste() {
   $("paste-summary").textContent = `Loaded ${plural(moves.length, "move", "moves")}.`;
 }
 
+const speakReading = ({ encoding, code }) => `${encoding}: ${code}`;
+
 const SIGNAL_NOTES = {
   empty: () => "",
   invalid: ({ invalid }) => `Only S and L count. Remove: ${invalid.join(" ")}.`,
   none: ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit no Morse code and no binary code. Check the pulses.`,
-  single: ({ pulses, readings }) => `${plural(pulses.length, "pulse", "pulses")} read as ${readings[0].encoding}.`,
-  "binary-rule": ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit both. The game uses binary here.`,
-  undecided: ({ pulses }) => `${plural(pulses.length, "pulse", "pulses")} fit both. The pulses alone cannot decide.`,
+  single: ({ readings }) => speakReading(readings[0]),
+  "binary-rule": ({ pulses, readings }) => `${speakReading(readings[0])}. ${plural(pulses.length, "pulse", "pulses")} fit both. The game uses binary here.`,
+  undecided: ({ pulses, readings }) => `${readings.map(speakReading).join(". ")}. ${plural(pulses.length, "pulse", "pulses")} fit both. The pulses alone cannot decide.`,
 };
 
 function renderSignal() {
@@ -302,11 +313,9 @@ function renderSignal() {
   $("signal-clear").disabled = text === "";
   $("signal-summary").textContent = SIGNAL_NOTES[result.status](result);
   $("signal-readings").replaceChildren(
-    ...result.readings.map(({ encoding, code }) => {
-      const item = element("li", "log-line valid pick");
-      item.append(element("span", "log-text", code), element("span", "log-tag", encoding));
-      return item;
-    }),
+    ...result.readings.map(({ encoding, code }) =>
+      answerItem("pick", element("span", "col-value", code), element("span", "answer-tag", encoding)),
+    ),
   );
 }
 
