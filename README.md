@@ -28,6 +28,10 @@ Keep the solver open next to the game:
 
 To take over a round that is already running, or to try a move of your own, open **Log a different move**. Pick the four fields, then tap the mismatch count. Set attempts left to what the game shows when you join a round that is already running. If an entry leaves no possible target, the solver shows a conflict and keeps the last valid state.
 
+## System Log Integrity
+
+Paste the log lines from the System Log Integrity puzzle into **System Log Integrity**. Each faulty line shows the error button to press and the bad token. The two lines with the most faults are marked as the pair to pick. A line is valid when it reads `[HH:MM:SS] TYPE /sector=N /status=S` with a type from `AUTH`, `TEMP-SYNC`, `SCAN`, `ROUTE-CHECK`, `RADIO-TEST`, `PING`, `SYNC`, a sector from 1 to 256 and a status of `OK`, `WARN` or `ERROR`.
+
 ## How it picks a move
 
 For each possible next move, the solver groups the remaining targets by the mismatch count that move would produce. It then counts, recursively, how many targets it can still hit within the attempts left. It plays the move with the highest count. It first checks the fewest attempts that still solve every remaining target, and searches with that number, so spare attempts never make a win slower. On a tie it prefers a move that can still be the target. A move that cannot be the target can still be the best probe. With four attempts the solver cannot reach every target: the best opening move solves 55 of 81. With five or more attempts it solves all 81, in five guesses at most (4.17 on average).

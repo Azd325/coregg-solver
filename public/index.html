@@ -211,6 +211,22 @@
         </ul>
       </section>
 
+      <section class="panel logcheck" aria-labelledby="log-title">
+        <h2 id="log-title">System Log Integrity</h2>
+        <p class="manual-help">Paste the log lines from the System Log Integrity puzzle, one per line. Each faulty line shows the error button to press. The two lines with the most faults are the pair to pick.</p>
+        <label class="visually-hidden" for="log-input">Log lines</label>
+        <textarea class="log-input" id="log-input" rows="6" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="[14:03:22] SCAN /sector=12 /status=OK"></textarea>
+        <div class="actions">
+          <button type="button" class="btn-quiet" id="log-clear" disabled>Clear log</button>
+        </div>
+        <details class="manual">
+          <summary>How the checker judges a line</summary>
+          <p class="manual-help">A valid line reads [HH:MM:SS] TYPE /sector=N /status=S. Hour is 00 to 23, minute and second 00 to 59, and a space follows the closing bracket. TYPE is AUTH, TEMP-SYNC, SCAN, ROUTE-CHECK, RADIO-TEST, PING or SYNC in upper case. N is a whole number from 1 to 256. S is OK, WARN or ERROR. A line has at most one fault per rule, and the pick is the two lines with the most faults. When two lines tie for second place, the earlier line is marked.</p>
+        </details>
+        <p class="move-note" id="log-summary" role="status"></p>
+        <ol class="log-lines" id="log-lines" role="list"></ol>
+      </section>
+
       <section class="panel faq" aria-labelledby="how-title">
         <h2 id="how-title">How it works</h2>
         <details class="manual">

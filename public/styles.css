@@ -614,6 +614,79 @@ kbd {
   font-weight: 700;
 }
 
+.log-input {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-muted);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-sm);
+  resize: vertical;
+}
+
+.log-lines {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.log-lines:empty {
+  display: none;
+}
+
+.log-line {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-inline-start-width: var(--space-2xs);
+  min-width: 0;
+}
+
+.log-line.valid {
+  color: var(--color-muted);
+}
+
+.log-line.faulty {
+  border-color: var(--color-error);
+}
+
+.log-line.pick {
+  border-color: var(--color-accent);
+  background: var(--color-paper-2);
+  box-shadow: var(--shadow-card);
+}
+
+.log-text {
+  font-family: ui-monospace, monospace;
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.log-tag {
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+}
+
+.log-faults {
+  display: grid;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.log-faults b {
+  color: var(--color-error);
+}
+
 .foot {
   padding-block-start: var(--space-sm);
   border-block-start: var(--rule-hair) solid var(--color-rule);

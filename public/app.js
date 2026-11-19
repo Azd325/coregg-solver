@@ -1,3 +1,4 @@
+import { checkLog } from "./logcheck.js";
 import { COMBOS, FIELDS, comboIndex, comboValues, candidatesFor, filterCandidates, guessesNeeded, play, roundState } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
@@ -215,6 +216,35 @@ function render() {
   restoreFocus(focusedId);
 }
 
+function renderLog() {
+  const text = $("log-input").value;
+  const lines = checkLog(text);
+  const faulty = lines.filter((line) => line.faults.length).length;
+  $("log-clear").disabled = text === "";
+  $("log-summary").textContent = lines.length
+    ? `${plural(lines.length, "line", "lines")} checked, ${plural(faulty, "faulty line", "faulty lines")}.`
+    : "";
+  $("log-lines").replaceChildren(
+    ...lines.map((line) => {
+      const item = element("li", `log-line ${line.faults.length ? "faulty" : "valid"}${line.pick ? " pick" : ""}`);
+      item.append(element("span", "log-text", `${line.number}. ${line.text}`));
+      if (line.pick) item.append(element("span", "log-tag", "Pick this line"));
+      if (!line.faults.length) item.append(element("span", "log-valid", "No faults"));
+      else {
+        const faults = element("ul", "log-faults");
+        faults.setAttribute("role", "list");
+        for (const fault of line.faults) {
+          const entry = element("li");
+          entry.append(element("b", "", fault.label), document.createTextNode(` (${fault.reason})`));
+          faults.append(entry);
+        }
+        item.append(faults);
+      }
+      return item;
+    }),
+  );
+}
+
 function restoreFocus(id) {
   const active = document.activeElement;
   if (!id || (active && active !== document.body && !active.disabled)) return;
@@ -223,6 +253,7 @@ function restoreFocus(id) {
 }
 
 document.addEventListener("keydown", (event) => {
+  if (event.target.closest?.("textarea")) return;
   if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
   const key = event.key.toLowerCase();
   const inManual = Boolean(event.target.closest?.("#manual"));
@@ -243,5 +274,11 @@ $("tries-down").addEventListener("click", () => setAttemptsLeft(state.triesLeft 
 $("tries-up").addEventListener("click", () => setAttemptsLeft(state.triesLeft + 1));
 $("undo").addEventListener("click", undo);
 $("reset").addEventListener("click", reset);
+$("log-input").addEventListener("input", renderLog);
+$("log-clear").addEventListener("click", () => {
+  $("log-input").value = "";
+  renderLog();
+  $("log-input").focus();
+});
 resetManual();
 render();

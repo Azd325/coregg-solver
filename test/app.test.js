@@ -260,3 +260,32 @@ test("a move played in the new round ends the chance to undo New round", async (
   assert.equal(text("#move-title"), "Attempt 1 of 6");
   assert.equal(document.getElementById("undo").disabled, true);
 });
+
+test("pasted log lines list each fault and mark the worst two lines", async () => {
+  const { document, text } = await openApp();
+  const input = document.querySelector("#log-input");
+  input.value = "[14:03:22] SCAN /sector=12 /status=OK\n[25:03:22] SCAN /sector=0 /status=OK\n[14:03:22] SYNC\n[14:03:22] PING /sector=1 /status=BAD";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(text("#log-summary"), "4 lines checked, 3 faulty lines.");
+  const rows = [...document.querySelectorAll("#log-lines li.log-line")];
+  assert.deepEqual(rows.map((row) => row.classList.contains("pick")), [false, true, true, false]);
+  assert.match(rows[1].textContent, /Time format is incorrect \(hour 25\)/);
+  assert.match(rows[1].textContent, /\/sector parameter is incorrect \(sector 0\)/);
+  assert.match(rows[3].textContent, /\/status parameter is incorrect \(status BAD\)/);
+});
+
+test("pasted text is shown as text, never as markup", async () => {
+  const { document } = await openApp();
+  const input = document.querySelector("#log-input");
+  input.value = "<img src=x onerror=alert(1)> /sector=1";
+  input.dispatchEvent(new document.defaultView.Event("input", { bubbles: true }));
+  assert.equal(document.querySelectorAll("#log-lines img").length, 0);
+  assert.match(document.querySelector("#log-lines .log-text").textContent, /<img src=x/);
+});
+
+test("solver keys typed in the log box do not log a move", async () => {
+  const { document, press, historyRows } = await openApp();
+  const input = document.querySelector("#log-input");
+  for (const key of ["0", "2", "n", "u"]) press(key, input);
+  assert.match(historyRows()[0], /Not played/);
+});
