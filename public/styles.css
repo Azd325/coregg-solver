@@ -18,8 +18,11 @@
 }
 
 .bar {
-  display: grid;
-  gap: var(--space-sm);
+  display: contents;
+}
+
+.bar > .score {
+  margin-top: calc(var(--space-sm) - var(--space-md));
 }
 
 .wordmark {
@@ -734,6 +737,15 @@ kbd {
   .key:active {
     translate: none;
   }
+}
+
+.jump {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky-nav);
+  margin-block: calc(var(--space-sm) - var(--space-md)) 0;
+  padding-block: var(--space-xs);
+  background: var(--color-paper);
 }
 
 .jump ul {
