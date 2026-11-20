@@ -748,12 +748,6 @@ kbd {
   background: var(--color-paper);
 }
 
-#config-hack,
-#log-integrity,
-#signal-hack {
-  scroll-margin-top: calc(var(--control-height) + 2 * var(--space-xs) + var(--space-sm));
-}
-
 .jump ul {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
