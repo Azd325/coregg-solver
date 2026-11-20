@@ -19,7 +19,7 @@ The minigame hides one combination of four fields:
 
 That gives 81 combinations. The game gives four or six attempts, depending on the mode. After each attempt the game reports how many fields are mismatched.
 
-The page also holds a System Log Integrity checker and a Signal Hack decoder. The links under the title jump to each of the three solvers. The list of possible targets is closed until you open it.
+The page also holds a System Log Integrity checker and a Signal Hack decoder. The links under the title jump to each of the three solvers. The links stay at the top of the screen while you scroll. The list of possible targets is closed until you open it.
 
 Keep the solver open next to the game:
 
