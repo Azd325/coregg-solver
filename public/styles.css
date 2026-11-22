@@ -750,7 +750,7 @@ kbd {
 
 .jump ul {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2xs);
   margin: 0;
   padding: 0;
@@ -786,4 +786,102 @@ kbd {
   text-decoration-color: var(--color-accent-2);
   text-decoration-thickness: 2px;
   text-underline-offset: 0.3em;
+}
+
+html {
+  scroll-padding-top: calc(var(--space-3xl) + var(--control-height));
+}
+
+.loadout-parts {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.loadout-parts label,
+.loadout-software legend {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.loadout-select {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-xs);
+  border: var(--rule-hair) solid var(--color-muted);
+  border-radius: var(--radius-card);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
+}
+
+.loadout-software {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.loadout-software legend {
+  padding: 0;
+  margin-block-end: var(--space-xs);
+}
+
+.loadout-programs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.loadout-programs li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-xs);
+  align-items: start;
+  padding: var(--space-2xs) var(--space-xs);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-card);
+}
+
+.loadout-programs li:has(input:checked) {
+  border-color: var(--color-accent);
+}
+
+.loadout-programs input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--color-accent);
+}
+
+.loadout-program {
+  display: grid;
+  cursor: pointer;
+}
+
+.loadout-program-name {
+  font-weight: 700;
+}
+
+.loadout-program-facts {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.loadout-table tr.short td {
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+.loadout-price {
+  font-weight: 700;
+}
+
+.loadout-price:empty {
+  display: none;
 }

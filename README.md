@@ -19,7 +19,7 @@ The minigame hides one combination of four fields:
 
 That gives 81 combinations. The game gives four or six attempts, depending on the mode. After each attempt the game reports how many fields are mismatched.
 
-The page also holds a System Log Integrity checker and a Signal Hack decoder. The links under the title jump to each of the three solvers. The links stay at the top of the screen while you scroll. The list of possible targets is closed until you open it.
+The page also holds a System Log Integrity checker, a Signal Hack decoder and a loadout simulator. The links under the title jump to each of the four sections. The links stay at the top of the screen while you scroll. The list of possible targets is closed until you open it.
 
 Keep the solver open next to the game:
 
@@ -40,6 +40,22 @@ Paste the log lines from the System Log Integrity puzzle into **System Log Integ
 
 Paste the pulses from the Signal Hack puzzle into **Signal Hack decoder**, as `S` for short and `L` for long. Morse reads groups of 5 pulses and binary reads groups of 4, with digits 0 to 9. A reading counts only when the pulse count divides by the group size and every group is a digit. When 40 pulses fit both, the game uses binary, so only binary shows. Any other pulse count that fits both shows both readings, and the page says it cannot decide.
 
+## Loadout simulator
+
+Pick one CPU, GPU, RAM and PSU in **Loadout simulator**, then tick the software to install. The page shows if the machine boots, each resource's need against what the parts have, the PSU load against its output, and the total price in credits.
+
+The catalog in `public/loadout-data.js` holds 19 parts and 13 programs with game facts only: names, specs, prices, tiers, markets, required reputation, vulnerability, PSU protection, program powers, server and file types, and resource consumption. Parts with no market price are listed as not sold.
+
+The simulator uses these rules, as observed in game:
+
+- Each program lists a base and a required value for each resource. Frequencies have no base, so their base is 0.
+- A resource needs the sum of the base values of all installed programs, plus the largest gap between required and base value among them. One program alone needs its required value.
+- A resource can be used up exactly.
+- The PSU load is the CPU draw plus the GPU draw. It must not exceed the PSU output.
+- The machine boots when all four parts are picked and every resource and the PSU fit. The game refuses to install a program that does not fit.
+
+Porter-triX lr8 has no consumption data yet. The simulator cannot check it, so a loadout with it that otherwise fits shows "cannot tell". The game rounds the values it shows, so a margin under 0.01 can go either way. A program's power varies inside its range from install to install, so the page shows only the range.
+
 ## How it picks a move
 
 For each possible next move, the solver groups the remaining targets by the mismatch count that move would produce. It then counts, recursively, how many targets it can still hit within the attempts left. It plays the move with the highest count. It first checks the fewest attempts that still solve every remaining target, and searches with that number, so spare attempts never make a win slower. On a tie it prefers a move that can still be the target. A move that cannot be the target can still be the best probe. With four attempts the solver cannot reach every target: the best opening move solves 55 of 81. With five or more attempts it solves all 81, in five guesses at most (4.17 on average).
@@ -49,6 +65,8 @@ The search for the four-attempt opening move takes about half a second, so that 
 ## Use it from an agent
 
 Install the skill with `npx skills add Azd325/coregg-solver`. Your agent then runs the solver locally and tells you the next move. The script takes `--attempts-left N` (the attempts the game still shows, at most eight in total with the attempts played; default: a six-attempt game, so pass `--attempts-left 4` before the first attempt of a four-attempt game).
+
+The same skill checks loadouts. `node scripts/loadout.mjs` (relative to the skill's directory) prints the catalog. `node scripts/loadout.mjs check --cpu "<name>" --gpu "<name>" --ram "<name>" --psu "<name>" --software "<name>"` prints the boot verdict, each resource's demand and supply, the PSU headroom and the price. Repeat `--software` for each program. `view "<name>"` prints every fact about one item. The output is compact TOON text for agents.
 
 ## Run locally
 

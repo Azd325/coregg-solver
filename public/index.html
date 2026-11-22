@@ -38,6 +38,7 @@
     </script>
     <script type="module" src="app.js"></script>
     <script type="module" src="jump.js"></script>
+    <script type="module" src="loadout-panel.js"></script>
   </head>
   <body>
     <main class="app">
@@ -48,6 +49,7 @@
             <li><a href="#config-hack">Config Hack</a></li>
             <li><a href="#log-integrity">Log Integrity</a></li>
             <li><a href="#signal-hack">Signal Hack</a></li>
+            <li><a href="#loadout">Loadout</a></li>
           </ul>
         </nav>
         <dl class="score">
@@ -261,6 +263,36 @@
         <details class="manual">
           <summary>How the decoder reads pulses</summary>
           <p class="manual-help">Morse reads groups of 5 pulses and binary reads groups of 4. A reading counts only when the pulse count divides by the group size and every group is a digit from 0 to 9. When 40 pulses fit both, the game uses binary, so only binary shows. Any other pulse count that fits both shows both readings, and the page cannot decide between them.</p>
+        </details>
+      </section>
+
+      <section class="panel logcheck" id="loadout" aria-labelledby="loadout-title">
+        <h2 id="loadout-title">Loadout simulator</h2>
+        <p class="manual-help">Pick one CPU, GPU, RAM and PSU, then tick the software to install. The page shows if the machine boots, what each resource needs and has, and the total price.</p>
+        <div class="loadout-parts" id="loadout-parts"></div>
+        <p class="move-note" id="loadout-summary" role="status"></p>
+        <table class="history loadout-table" id="loadout-table" hidden>
+          <thead>
+            <tr>
+              <th scope="col">Resource</th>
+              <th scope="col" class="num">Need</th>
+              <th scope="col" class="num">Have</th>
+              <th scope="col" class="num">Left</th>
+            </tr>
+          </thead>
+          <tbody id="loadout-resources"></tbody>
+        </table>
+        <p class="loadout-price" id="loadout-price"></p>
+        <fieldset class="loadout-software">
+          <legend>Software</legend>
+          <ul class="loadout-programs" id="loadout-programs" role="list"></ul>
+        </fieldset>
+        <div class="actions">
+          <button type="button" class="btn-quiet" id="loadout-clear" disabled>Clear loadout</button>
+        </div>
+        <details class="manual">
+          <summary>How the simulator checks a loadout</summary>
+          <p class="manual-help">These rules match what the game shows. One program alone needs its required value of each resource. With more programs, a resource needs the sum of every program's base value plus the largest gap between required and base value among them. A resource can be used up exactly. The PSU must give at least the CPU draw plus the GPU draw. The game refuses to install a program that does not fit. Porter-triX lr8 has no consumption data yet, so the page cannot check it. The game rounds what it shows, so a margin under 0.01 can go either way.</p>
         </details>
       </section>
 
