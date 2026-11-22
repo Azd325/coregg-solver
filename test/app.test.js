@@ -428,7 +428,7 @@ test("Undo after a pasted log removes the last pasted move, and a loaded log kee
   assert.match(app.historyRows()[0], /^1v1\.0 GET LTE AES1/);
 });
 
-test("jump row links point at the three solver sections in order", () => {
+test("jump row links point at the four sections in order", () => {
   const { document } = new JSDOM(html).window;
   const links = [...document.querySelectorAll('nav[aria-label="Solvers"] ul[role="list"] a')];
   assert.deepEqual(
@@ -437,6 +437,7 @@ test("jump row links point at the three solver sections in order", () => {
       ["Config Hack", "#config-hack"],
       ["Log Integrity", "#log-integrity"],
       ["Signal Hack", "#signal-hack"],
+      ["Loadout", "#loadout"],
     ],
   );
   for (const a of links) assert.ok(document.querySelector(a.getAttribute("href")), a.getAttribute("href"));
